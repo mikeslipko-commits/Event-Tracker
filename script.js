@@ -15,78 +15,74 @@ const db = firebase.database();
 
 let currentUserId = localStorage.getItem('grand_rp_user_id') || null;
 let userData = null;
-let isRegisterMode = false;
 
 // Prüfen ob bereits eingeloggt
 if (currentUserId) {
     checkLoginState();
 }
 
-function toggleAuthMode() {
-    isRegisterMode = !isRegisterMode;
-    if (isRegisterMode) {
-        document.getElementById('authTitle').innerText = "Konto registrieren";
-        document.getElementById('phoneGroup').classList.remove('hidden');
-        document.getElementById('authBtn').innerText = "Registrieren & Einloggen";
-        document.getElementById('toggleAuthBtn').innerText = "Bereits registriert? Zum Login";
-    } else {
-        document.getElementById('authTitle').innerText = "Grand RP DE 03 Login";
-        document.getElementById('phoneGroup').classList.add('hidden');
-        document.getElementById('authBtn').innerText = "Einloggen";
-        document.getElementById('toggleAuthBtn').innerText = "Noch kein Konto? Hier registrieren";
-    }
-}
-
-function handleAuth() {
+// REGISTRIERUNGS-FUNKTION
+function handleRegister() {
     const username = document.getElementById('authUsername').value.trim();
     const icId = document.getElementById('authID').value.trim();
     const phone = document.getElementById('authPhone').value.trim();
 
-    if (!username || !icId) {
-        alert("Bitte IC Name und ID ausfüllen!");
+    if (!username || !icId || !phone) {
+        alert("Fehler: Für die Registrierung müssen IC Name, ID UND Telefonnummer ausgefüllt sein!");
         return;
     }
 
     const cleanKey = (username + "_" + icId).replace(/[^a-zA-Z0-9_]/g, "");
 
-    if (isRegisterMode) {
-        if (!phone) { alert("Bitte Telefonnummer angeben!"); return; }
+    db.ref('users/' + cleanKey).once('value', snapshot => {
+        if (snapshot.exists()) {
+            alert("Diese Kombination aus Name und ID existiert bereits! Nutze den Einloggen-Button.");
+        } else {
+            db.ref('users').once('value', usersSnap => {
+                const role = usersSnap.exists() ? "Mitglied" : "Chef";
+                
+                const newProfile = {
+                    username: username,
+                    icId: icId,
+                    phone: phone,
+                    role: role
+                };
 
-        db.ref('users/' + cleanKey).once('value', snapshot => {
-            if (snapshot.exists()) {
-                alert("Diese Kombination aus Name und ID existiert bereits!");
-            } else {
-                db.ref('users').once('value', usersSnap => {
-                    const role = usersSnap.exists() ? "Mitglied" : "Chef";
-                    
-                    const newProfile = {
-                        username: username,
-                        icId: icId,
-                        phone: phone,
-                        role: role
-                    };
-
-                    db.ref('users/' + cleanKey).set(newProfile, error => {
-                        if(!error) {
-                            localStorage.setItem('grand_rp_user_id', cleanKey);
-                            currentUserId = cleanKey;
-                            checkLoginState();
-                        }
-                    });
+                db.ref('users/' + cleanKey).set(newProfile, error => {
+                    if(!error) {
+                        localStorage.setItem('grand_rp_user_id', cleanKey);
+                        currentUserId = cleanKey;
+                        checkLoginState();
+                    } else {
+                        alert("Datenbankfehler: " + error.message);
+                    }
                 });
-            }
-        });
-    } else {
-        db.ref('users/' + cleanKey).once('value', snapshot => {
-            if (snapshot.exists()) {
-                localStorage.setItem('grand_rp_user_id', cleanKey);
-                currentUserId = cleanKey;
-                checkLoginState();
-            } else {
-                alert("Konto nicht gefunden! Registriere dich bitte zuerst.");
-            }
-        });
+            });
+        }
+    });
+}
+
+// LOGIN-FUNKTION
+function handleLogin() {
+    const username = document.getElementById('authUsername').value.trim();
+    const icId = document.getElementById('authID').value.trim();
+
+    if (!username || !icId) {
+        alert("Bitte IC Name und ID zum Einloggen ausfüllen!");
+        return;
     }
+
+    const cleanKey = (username + "_" + icId).replace(/[^a-zA-Z0-9_]/g, "");
+
+    db.ref('users/' + cleanKey).once('value', snapshot => {
+        if (snapshot.exists()) {
+            localStorage.setItem('grand_rp_user_id', cleanKey);
+            currentUserId = cleanKey;
+            checkLoginState();
+        } else {
+            alert("Konto nicht gefunden! Falls du neu bist, fülle auch das Telefonnummer-Feld aus und klicke auf 'Neues Konto registrieren'.");
+        }
+    });
 }
 
 function checkLoginState() {
@@ -128,7 +124,7 @@ function addEvent() {
     const time = document.getElementById('eventTime').value;
     const eventSelect = document.getElementById('eventType');
     const amount = parseInt(eventSelect.value);
-    const name = eventSelect.options[eventSelect.selectedIndex].text.split(' (')[0];
+    const name = eventSelect.options[eventSelect.selectedIndex].text.split(' (');
 
     if (!time) { alert("Bitte gib eine Uhrzeit an!"); return; }
 
