@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grand RP DE 03 - Family Payout Tracker</title>
-    <!-- Firebase SDKs direkt über das Web laden -->
+    <!-- Firebase SDKs -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
     
@@ -199,11 +199,10 @@
         </div>
         
         <div class="form-group" id="phoneGroup">
-            <label for="authPhone">Telefonnummer (wird nur beim Registrieren gespeichert):</label>
+            <label for="authPhone">Telefonnummer:</label>
             <input type="number" id="authPhone" placeholder="99887766">
         </div>
 
-        <!-- Zwei eigenständige Knöpfe ohne Umschalt-Zwang -->
         <button id="btnLogin" onclick="handleLogin()">Einloggen</button>
         <button id="btnRegister" onclick="handleRegister()" class="btn-reg">Neues Konto registrieren</button>
     </div>
@@ -252,7 +251,9 @@
     </div>
 
     <script>
-        // Deine echten Firebase-Projektdaten
+        // ################################################################
+        // SCHRITT 2: ERSETZE DIE ZEILEN HIER UNTEN MIT DEINEM BLOCK AUS FIREBASE
+        // ################################################################
         const firebaseConfig = {
   apiKey: "AIzaSyDlxKrv4KtPqUKwpVK8Umzz-AzaBxFWQsI",
   authDomain: "grandrp-tracker.firebaseapp.com",
@@ -262,7 +263,8 @@
   messagingSenderId: "538153636196",
   appId: "1:538153636196:web:a6d52f03b606ae5b7daa71"
 };
-        
+        // ################################################################
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -273,7 +275,6 @@
             checkLoginState();
         }
 
-        // REGISTRIEREN
         function handleRegister() {
             const username = document.getElementById('authUsername').value.trim();
             const icId = document.getElementById('authID').value.trim();
@@ -307,5 +308,3 @@
                                 checkLoginState();
                             } else {
                                 alert("Datenbank-Fehler: " + error.message);
-                            }
-                        });
