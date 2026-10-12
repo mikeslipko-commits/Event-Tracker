@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grand RP DE 03 - Family Payout Tracker</title>
-    <!-- Firebase SDKs im modernen Modul-Format perfekt vordefiniert -->
+    
+    <!-- Moderne Firebase v13 Einbindung -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+        import { initializeApp } from "https://gstatic.com";
         import { getDatabase, ref, set, get, child, onValue, remove } from "https://gstatic.com";
 
         // Deine echten Projektdaten aus Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDlxKrv4KtPqUKwpVK8Umzz-AzaBxFWQsI",
-            authDomain: "grandrp-tracker.firebaseapp.com",
+            authDomain: "://firebaseapp.com",
             databaseURL: "https://grandrp-tracker-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "grandrp-tracker",
             storageBucket: "grandrp-tracker.firebasestorage.app",
@@ -20,20 +21,19 @@
             appId: "1:538153636196:web:a6d52f03b606ae5b7daa71"
         };
 
-        // Datenbank-Instanz initialisieren
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Verknuepft die Kernfunktionen direkt mit den HTML-Buttons
+        // Funktionen fuer das restliche HTML-Skript global verfuegbar machen
         window.db = db;
-        window.ref = ref;
-        window.set = set;
-        window.get = get;
-        window.child = child;
-        window.onValue = onValue;
-        window.remove = remove;
+        window.fbRef = ref;
+        window.fbSet = set;
+        window.fbGet = get;
+        window.fbChild = child;
+        window.fbOnValue = onValue;
+        window.fbRemove = remove;
         
-        // Logik-Funktionen laden, sobald die Verbindung steht
+        // Startet die App-Logik, sobald Firebase geladen ist
         initializeLogic();
     </script>
     
@@ -228,7 +228,7 @@
         </div>
         
         <div class="form-group" id="phoneGroup">
-            <label for="authPhone">Telefonnummer:</label>
+            <label for="authPhone">Telefonnummer (nur für Registrierung):</label>
             <input type="number" id="authPhone" placeholder="99887766">
         </div>
 
@@ -302,13 +302,13 @@
 
             const cleanKey = (username + "_" + icId).replace(/[^a-zA-Z0-9_]/g, "");
 
-            const userRef = window.ref(window.db, 'users/' + cleanKey);
-            window.get(userRef).then(snapshot => {
+            const userRef = window.fbRef(window.db, 'users/' + cleanKey);
+            window.fbGet(userRef).then(snapshot => {
                 if (snapshot.exists()) {
                     alert("Konto existiert bereits! Klicke auf 'Einloggen'.");
                 } else {
-                    const allUsersRef = window.ref(window.db, 'users');
-                    window.get(allUsersRef).then(usersSnap => {
+                    const allUsersRef = window.fbRef(window.db, 'users');
+                    window.fbGet(allUsersRef).then(usersSnap => {
                         const role = usersSnap.exists() ? "Mitglied" : "Chef";
                         
                         const newProfile = {
