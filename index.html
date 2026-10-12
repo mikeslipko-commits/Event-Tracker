@@ -3,131 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ballas Member Liste & Tracker</title>
+    <title>Ballas Member Liste & Management Board</title>
     <style>
-        /* Original-Styling deiner Netlify-Website */
-        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+        /* Originales futuristisches Ballas-Design deiner Netlify-Seite */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
 
-        body{
-            min-height:100vh;
-            background:radial-gradient(circle at top,#a855f7 0,#1f2937 35%,#020617 75%,#000);
-            color:#f9fafb;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            padding:32px 16px;
-            overflow-x:hidden;
-        }
-        body::before{
-            content:"";
-            position:fixed;inset:0;
-            background-image:
-                linear-gradient(rgba(148,163,184,.08) 1px,transparent 1px),
-                linear-gradient(90deg,rgba(148,163,184,.08) 1px,transparent 1px);
-            background-size:40px 40px;
-            opacity:.4;pointer-events:none;z-index:-2;
-        }
-        body::after{
-            content:"";
-            position:fixed;inset:0;
-            background:
-                radial-gradient(circle at 10% 10%,rgba(251,113,133,.16),transparent 55%),
-                radial-gradient(circle at 90% 20%,rgba(129,140,248,.24),transparent 55%),
-                radial-gradient(circle at 15% 80%,rgba(56,189,248,.18),transparent 60%);
-            pointer-events:none;z-index:-1;
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #a855f7 0, #1f2937 35%, #020617 75%, #000);
+            color: #f9fafb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 32px 16px;
+            overflow-x: hidden;
         }
 
-        .container{
-            width:100%;max-width:900px;
-            background:radial-gradient(circle at top left,rgba(15,23,42,.95),rgba(15,23,42,.93));
-            border-radius:26px;
-            border:1px solid rgba(129,140,248,.5);
-            box-shadow:0 0 0 1px rgba(15,23,42,.9),0 20px 60px rgba(15,23,42,.95),0 0 80px rgba(168,85,247,.35);
-            backdrop-filter:blur(20px);
-            overflow:hidden;position:relative;
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background: radial-gradient(circle at top left, rgba(15,23,42,.95), rgba(15,23,42,.93));
+            border-radius: 26px;
+            border: 1px solid rgba(129,140,248,.5);
+            box-shadow: 0 20px 60px rgba(15,23,42,.95), 0 0 80px rgba(168,85,247,.35);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+            margin-bottom: 20px;
         }
 
-        .header{
-            padding:20px 24px;
-            display:flex;flex-direction:column;gap:10px;
-            border-bottom:1px solid rgba(148,163,184,.35);
-            background:
-                linear-gradient(115deg,rgba(15,23,42,.96),rgba(30,64,175,.96)),
-                radial-gradient(circle at top right,rgba(251,113,133,.25),transparent 60%);
+        .header {
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(148,163,184,.35);
+            background: linear-gradient(115deg, rgba(15,23,42,.96), rgba(30,64,175,.96));
         }
-        .header-top{display:flex;justify-content:space-between;align-items:center;gap:16px;}
-        .title{
-            font-size:24px;letter-spacing:.14em;text-transform:uppercase;
-            font-weight:800;color:#e5e7eb;
-            text-shadow:0 0 10px rgba(248,250,252,.7),0 0 32px rgba(129,140,248,.8);
-        }
-        .status-pill{
-            display:inline-flex;align-items:center;gap:6px;
-            padding:5px 12px;border-radius:999px;
-            background:rgba(15,23,42,.88);
-            border:1px solid rgba(34,197,94,.8);
-            box-shadow:0 0 16px rgba(34,197,94,.7);
-            font-size:11px;text-transform:uppercase;letter-spacing:.16em;
-            color:#dcfce7;
-        }
-        .status-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 12px #22c55e;}
 
-        .content{padding:24px;}
+        .title {
+            font-size: 24px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #e5e7eb;
+            text-shadow: 0 0 10px rgba(248,250,252,.7), 0 0 32px rgba(129,140,248,.8);
+        }
 
-        /* Formular-Styling */
-        .form-group { margin-bottom: 16px; }
-        label { display: block; margin-bottom: 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: #94a3b8; }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 11px;
+            border-radius: 999px;
+            background: rgba(15,23,42,.88);
+            border: 1px solid rgba(148,163,184,.8);
+            color: #e5e7eb;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .16em;
+        }
+
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 12px #a855f7; }
+
+        .content { padding: 20px; display: grid; grid-template-columns: 1fr; gap: 20px; }
+        
+        @media(min-width: 768px) {
+            .management-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        }
+
+        .card {
+            border-radius: 20px;
+            background: rgba(15,23,42,.6);
+            border: 1px solid rgba(129,140,248,.3);
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2, h3 { color: #da70d6; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 15px; font-size: 18px; }
+
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 6px; font-size: 12px; color: #94a3b8; text-transform: uppercase; }
+        
         input, select {
-            width: 100%; padding: 12px 16px; border-radius: 12px;
-            background: rgba(15,23,42,.8); border: 1px solid rgba(129,140,248,.4);
-            color: #f9fafb; font-size: 14px; outline: none; transition: all 0.2s;
+            width: 100%; padding: 10px 14px; border-radius: 10px;
+            background: rgba(15,23,42,.8); border: 1px solid rgba(129,140,248,.3);
+            color: #fff; font-size: 14px; outline: none;
         }
-        input:focus, select:focus { border-color: #a855f7; box-shadow: 0 0 12px rgba(168,85,247,.4); }
+        input:focus, select:focus { border-color: #a855f7; box-shadow: 0 0 10px rgba(168,85,247,0.5); }
 
         button {
-            width: 100%; padding: 14px; border-radius: 12px; border: none;
+            width: 100%; padding: 12px; border-radius: 10px; border: none;
             background: linear-gradient(135deg, #a855f7, #7c3aed);
-            color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
-            cursor: pointer; box-shadow: 0 4px 20px rgba(168,85,247,0.4); transition: all 0.2s;
+            color: #fff; font-weight: 700; text-transform: uppercase; cursor: pointer;
+            margin-top: 5px; transition: all 0.2s;
         }
-        button:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(168,85,247,0.6); }
+        button:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(168,85,247,0.5); }
 
-        /* Listen & Tabellen-Karten */
-        .table-card{
-            border-radius:20px;
-            background:radial-gradient(circle at top left,rgba(15,23,42,.98),rgba(15,23,42,.96));
-            border:1px solid rgba(51,65,85,.8);
-            box-shadow:0 18px 36px rgba(15,23,42,.95),0 0 40px rgba(88,28,135,.5);
-            overflow:hidden; margin-top: 20px;
+        .btn-pay {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            padding: 5px 10px;
+            font-size: 11px;
+            width: auto;
+            display: inline-block;
+            margin-top: 0;
         }
-        .table-header-row{
-            padding:12px 16px;
-            background: linear-gradient(115deg,rgba(15,23,42,1),rgba(30,64,175,.95));
-            font-size:12px; text-transform:uppercase; letter-spacing:.16em; color:#e5e7eb;
-            font-weight: bold; border-bottom: 1px solid rgba(75,85,99,.9);
-        }
-        .table-wrapper { overflow-x: auto; max-height: 300px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px 16px; text-align: left; }
-        th { font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: #94a3b8; border-bottom: 1px solid rgba(148,163,184,.4); }
-        tbody tr { border-bottom: 1px solid rgba(30,41,59,.8); }
-        tbody tr:nth-child(odd) { background: rgba(15,23,42,.5); }
-        tbody tr:hover { background: rgba(129,140,248,.15); }
+        .btn-pay:hover { box-shadow: 0 4px 10px rgba(34,197,94,0.4); }
 
-        .total-box {
-            margin-top: 20px; padding: 20px; border-radius: 16px; text-align: center;
-            background: radial-gradient(circle at top, rgba(34,197,94,.15), rgba(15,23,42,.9));
-            border: 1px solid rgba(34,197,94,.5); box-shadow: 0 0 20px rgba(34,197,94,0.2);
-        }
-        .total-amount { font-size: 36px; color: #22c55e; font-weight: 800; text-shadow: 0 0 16px rgba(34,197,94,0.6); margin-top: 5px; }
+        /* Tabelle & Badges */
+        .table-wrapper { overflow-x: auto; margin-top: 10px; border-radius: 12px; border: 1px solid rgba(129,140,248,.3); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th, td { padding: 12px; }
+        th { background: rgba(15,23,42,.95); color: #94a3b8; text-transform: uppercase; font-size: 11px; letter-spacing: .1em; }
+        tbody tr { border-bottom: 1px solid rgba(30,41,59,.5); background: rgba(15,23,42,.4); }
+        tbody tr:hover { background: rgba(129,140,248,.1); }
 
-        .badge-active {
-            padding: 3px 9px; border-radius: 999px; font-size: 11px; text-transform: uppercase; letter-spacing: .16em;
-            border: 1px solid rgba(34,197,94,.95); background: rgba(34,197,94,.2); color: #bbf7d0; box-shadow: 0 0 12px rgba(34,197,94,.4);
-        }
+        .badge-admin { padding: 3px 8px; border-radius: 999px; font-size: 11px; background: rgba(168,85,247,.2); border: 1px solid #a855f7; color: #f3e8ff; }
+        .badge-member { padding: 3px 8px; border-radius: 999px; font-size: 11px; background: rgba(148,163,184,.2); border: 1px solid #94a3b8; color: #f8fafc; }
 
+        .total-box { background: rgba(34,197,94,.1); border-left: 4px solid #22c55e; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
+        .total-amount { font-size: 28px; color: #22c55e; font-weight: 800; }
+        
         .hidden { display: none !important; }
-        .footer { font-size: 11px; color: #475569; text-align: center; margin-top: 24px; letter-spacing: 0.05em; }
+        .footer { font-size: 11px; color: #475569; text-align: center; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -135,78 +133,84 @@
     <div class="container">
         <!-- HEADER -->
         <div class="header">
-            <div class="header-top">
-                <div class="title" id="boardTitle">Ballas Login</div>
-                <div class="status-pill">
-                    <div class="status-dot"></div>
-                    <span>Set Aktiv</span>
-                </div>
-            </div>
+            <div class="title" id="mainTitle">Ballas Board</div>
+            <div class="status-pill"><div class="status-dot"></div><span id="roleDisplay">Gast</span></div>
         </div>
 
-        <!-- CONTENT BEREICH -->
+        <!-- INHALT -->
         <div class="content">
-            
-            <!-- ANMELDUNG -->
-            <div id="authArea">
+
+            <!-- LOGIN-BEREICH -->
+            <div id="authArea" class="card" style="max-width: 500px; margin: 0 auto; width: 100%;">
+                <h2>Ballas Login</h2>
                 <div class="form-group">
-                    <label>IC Name (Vorname_Nachname):</label>
-                    <input type="text" id="authUsername" placeholder="Mia_Parker">
+                    <label>Benutzername (IC Name):</label>
+                    <input type="text" id="loginUser" placeholder="Mia_Parker">
                 </div>
                 <div class="form-group">
-                    <label>IC ID (Visumsnummer):</label>
-                    <input type="number" id="authID" placeholder="12345">
+                    <label>Passwort:</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••">
                 </div>
-                <div class="form-group">
-                    <label>Set-Rang:</label>
-                    <select id="authRang">
-                        <option value="1 · Snitch">1 · Snitch</option>
-                        <option value="2 · Day One">2 · Day One</option>
-                        <option value="5 · Full Balla">5 · Full Balla</option>
-                        <option value="9 · Vize OG">9 · Vize OG</option>
-                        <option value="10 · OG">10 · OG</option>
-                    </select>
-                </div>
-                <button onclick="handleAuth()">Das Set betreten</button>
+                <button onclick="handleLogin()">Login</button>
             </div>
 
-            <!-- EVENT TRACKER BOARD -->
-            <div id="playerArea" class="hidden">
-                <div class="form-group">
-                    <label>Anfahrts-Uhrzeit:</label>
-                    <input type="time" id="eventTime">
+            <!-- HAUPTMENÜ (NACH LOGIN SICHTBAR) -->
+            <div id="dashboardArea" class="hidden">
+                
+                <!-- EVENT TRACKER CARD (FÜR ALLE SICHTBAR) -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3>Ballas Event-Tracker & Auszahlung</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label>Uhrzeit des Events:</label>
+                            <input type="time" id="eventTime">
+                        </div>
+                        <div class="form-group">
+                            <label>Aktivität auswählen:</label>
+                            <select id="eventType">
+                                <option value="50000">Flugzeugträger ($50.000)</option>
+                                <option value="40000">Waffenfabrik ($40.000)</option>
+                                <option value="60000">Gießerei ($60.000)</option>
+                                <option value="75000">Informations-Panel ($75.000)</option>
+                                <option value="100000">König der Insel ($100.000)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="addEvent()">Aktivität im Set verbuchen</button>
+                    
+                    <div class="total-box" style="margin-top: 15px;">
+                        <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Deine offene Event-Auszahlung:</div>
+                        <div class="total-amount" id="userTotal">$0</div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Event-Typ auswählen:</label>
-                    <select id="eventType">
-                        <option value="50000">Flugzeugträger ($50.000)</option>
-                        <option value="40000">Waffenfabrik ($40.000)</option>
-                        <option value="60000">Gießerei ($60.000)</option>
-                        <option value="75000">Informations-Panel ($75.000)</option>
-                        <option value="100000">König der Insel ($100.000)</option>
-                    </select>
-                </div>
-                <button onclick="addEvent()">Event im Set verbuchen</button>
 
-                <!-- GESAMTANZEIGE -->
-                <div class="total-box">
-                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: .15em; color: #94a3b8;">Offener Auszahlungsanspruch:</div>
-                    <div class="total-amount" id="userTotal">$0</div>
-                </div>
+                <!-- MANAGEMENT GRID (NUR FÜR RANG 2 / ADMIN SICHTBAR) -->
+                <div class="management-grid id="adminGrid" class="hidden">
+                    
+                    <!-- NEUEN BALLA EINTRAGEN -->
+                    <div class="card" id="adminCardAdd">
+                        <h3>Neuen Balla eintragen</h3>
+                        <div class="form-group">
+                            <label>Benutzername:</label>
+                            <input type="text" id="newBallaName" placeholder="Ali_Verona">
+                        </div>
+                        <div class="form-group">
+                            <label>Passwort:</label>
+                            <input type="text" id="newBallaPassword" placeholder="ballas123">
+                        </div>
+                        <div class="form-group">
+                            <label>Berechtigungs-Rang:</label>
+                            <select id="newBallaRang">
+                                <option value="Member">Rang 1 · Member (nur eintragen)</option>
+                                <option value="Admin">Rang 2 · Admin (volle Verwaltung)</option>
+                            </select>
+                        </div>
+                        <button onclick="addMember()">+ Login anlegen</button>
+                    </div>
 
-                <!-- LIVE MITGLIEDER TABLE CARD -->
-                <div class="table-card">
-                    <div class="table-header-row">Verbuchte Familien-Aktivitäten</div>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Uhrzeit</th>
-                                    <th>Aktivität</th>
-                                    <th>Status</th>
-                                    <th>Auszahlung</th>
-                                </tr>
-                            </thead>
-                            <tbody id="myLogList">
-                                <!-- Einträge landen hier live -->
-                            </tbody>
+                    <!-- MITGLIED AUSTRAGEN / VERWALTEN -->
+                    <div class="card" id="adminCardManage">
+                        <h3>Mitglied verwalten</h3>
+                        <div class="form-group">
+                            <label>Mitglied wählen:</label>
+                            <select id="selectManageMember">
