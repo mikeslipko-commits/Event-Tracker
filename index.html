@@ -1,234 +1,1510 @@
 <!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ballas Member Liste & Management Board</title>
-    
-    <!-- DIE LOGIK DIREKT IM HEAD-BEREICH (SICHER GEGEN ABSCHNEIDEN) -->
-    <script>
-        // Accounts direkt initialisieren
-        if (!localStorage.getItem('ballas_accounts')) {
-            var defaultAccounts = [
-                { name: "Mia_Parker", password: "123", rang: "Admin", events: 0 },
-                { name: "Norbert_Red", password: "123", rang: "Admin", events: 0 }
-            ];
-            localStorage.setItem('ballas_accounts', JSON.stringify(defaultAccounts));
+<!-- saved from url=(0038)https://ballasmemberliste.netlify.app/ -->
+<html lang="de"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=7fb91f15-4ae9-4456-9107-37e012d88d65
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+  <title>Ballas Member Liste</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+
+    body{
+      min-height:100vh;
+      background:radial-gradient(circle at top,#a855f7 0,#1f2937 35%,#020617 75%,#000);
+      color:#f9fafb;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px 16px;
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed;inset:0;
+      background-image:
+        linear-gradient(rgba(148,163,184,.08) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(148,163,184,.08) 1px,transparent 1px);
+      background-size:40px 40px;
+      opacity:.4;pointer-events:none;z-index:-2;
+    }
+    body::after{
+      content:"";
+      position:fixed;inset:0;
+      background:
+        radial-gradient(circle at 10% 10%,rgba(251,113,133,.16),transparent 55%),
+        radial-gradient(circle at 90% 20%,rgba(129,140,248,.24),transparent 55%),
+        radial-gradient(circle at 15% 80%,rgba(56,189,248,.18),transparent 60%);
+      pointer-events:none;z-index:-1;
+    }
+
+    .auth-hidden{display:none !important;}
+
+    .container{
+      width:100%;max-width:1100px;
+      background:radial-gradient(circle at top left,rgba(15,23,42,.95),rgba(15,23,42,.93));
+      border-radius:26px;
+      border:1px solid rgba(129,140,248,.5);
+      box-shadow:0 0 0 1px rgba(15,23,42,.9),0 20px 60px rgba(15,23,42,.95),0 0 80px rgba(168,85,247,.35);
+      backdrop-filter:blur(20px);
+      overflow:hidden;position:relative;
+    }
+    .inner{position:relative;z-index:1;}
+
+    .header{
+      padding:18px 24px 10px;
+      display:flex;flex-direction:column;gap:10px;
+      border-bottom:1px solid rgba(148,163,184,.35);
+      background:
+        linear-gradient(115deg,rgba(15,23,42,.96),rgba(30,64,175,.96)),
+        radial-gradient(circle at top right,rgba(251,113,133,.25),transparent 60%);
+    }
+    .header-top{display:flex;justify-content:space-between;align-items:center;gap:16px;}
+    .title-block{display:flex;flex-direction:column;gap:4px;}
+    .title{
+      font-size:24px;letter-spacing:.14em;text-transform:uppercase;
+      font-weight:800;color:#e5e7eb;
+      text-shadow:0 0 10px rgba(248,250,252,.7),0 0 32px rgba(129,140,248,.8);
+    }
+    .header-badges{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .status-pill{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:4px 11px;border-radius:999px;
+      background:rgba(15,23,42,.88);
+      border:1px solid rgba(34,197,94,.8);
+      box-shadow:0 0 16px rgba(34,197,94,.7);
+      font-size:11px;text-transform:uppercase;letter-spacing:.16em;
+      color:#dcfce7;
+    }
+    .status-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 12px #22c55e;}
+
+    .user-pill{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:4px 11px;border-radius:999px;
+      background:rgba(15,23,42,.9);
+      border:1px solid rgba(191,219,254,.9);
+      font-size:11px;text-transform:uppercase;letter-spacing:.16em;
+      color:#e5e7eb;
+      max-width:260px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .content{padding:16px 20px 20px;}
+
+    .table-card{
+      border-radius:20px;
+      background:radial-gradient(circle at top left,rgba(15,23,42,.98),rgba(15,23,42,.96));
+      border:1px solid rgba(51,65,85,.8);
+      box-shadow:0 18px 36px rgba(15,23,42,.95),0 0 40px rgba(88,28,135,.5);
+      overflow:hidden;
+    }
+
+    .table-header-row{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:10px 14px;border-bottom:1px solid rgba(75,85,99,.9);
+      background:
+        linear-gradient(115deg,rgba(15,23,42,1),rgba(30,64,175,.95)),
+        radial-gradient(circle at right,rgba(94,234,212,.25),transparent 55%);
+      font-size:12px;text-transform:uppercase;letter-spacing:.16em;
+      color:rgba(229,231,235,.9);
+    }
+    .table-search{flex:0 0 260px;display:flex;justify-content:flex-end;}
+    .table-search input{
+      width:100%;max-width:260px;padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(191,219,254,.9);
+      background:rgba(15,23,42,.9);color:#e5e7eb;font-size:12px;letter-spacing:.04em;outline:none;
+    }
+    .table-search input::placeholder{color:rgba(148,163,184,.9);}
+    .table-search input:focus{border-color:rgba(45,212,191,.95);box-shadow:0 0 10px rgba(45,212,191,.7);}
+
+    .table-wrapper{overflow-x:auto;max-height:420px;}
+    table{width:100%;border-collapse:collapse;border-spacing:0;font-size:14px;}
+    thead{background:rgba(15,23,42,.98);}
+    th,td{padding:9px 12px;text-align:left;white-space:nowrap;}
+    th{
+      font-size:11px;text-transform:uppercase;letter-spacing:.14em;
+      color:rgba(209,213,219,.9);
+      border-bottom:1px solid rgba(148,163,184,.7);
+      background:
+        linear-gradient(120deg,rgba(15,23,42,1),rgba(30,64,175,.9)),
+        radial-gradient(circle at left,rgba(147,197,253,.2),transparent 55%);
+      position:sticky;top:0;z-index:1;
+    }
+    tbody tr{transition:background .15s ease,transform .08s ease,box-shadow .08s ease;}
+    tbody tr:nth-child(odd){background:rgba(15,23,42,.96);}
+    tbody tr:nth-child(even){background:rgba(17,24,39,.96);}
+    tbody tr:hover{
+      background:radial-gradient(circle at left,rgba(129,140,248,.3),rgba(15,23,42,.98));
+      transform:translateY(-1px);
+      box-shadow:0 0 18px rgba(129,140,248,.6);
+    }
+    td{border-bottom:1px solid rgba(30,41,59,.8);color:rgba(243,244,246,.92);}
+
+    .col-name{font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:13px;cursor:pointer;}
+    .col-id{font-size:12px;color:rgba(191,219,254,.95);}
+
+    .badge-new,
+    .badge-not-new,
+    .badge-active,
+    .badge-inactive,
+    .badge-watch,
+    .badge-no-watch{
+      display:inline-block;
+      padding:3px 9px;
+      border-radius:999px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+    }
+
+    .badge-new{
+      padding:4px 9px;
+      border:1px solid rgba(45,212,191,.9);
+      background:radial-gradient(circle at top,rgba(45,212,191,.3),rgba(15,23,42,.98));
+      color:#ecfeff;box-shadow:0 0 14px rgba(45,212,191,.7);
+    }
+    .badge-not-new{
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.98);color:rgba(229,231,235,.9);
+    }
+
+    .badge-active{
+      border:1px solid rgba(34,197,94,.95);
+      background:radial-gradient(circle at top,rgba(34,197,94,.5),rgba(15,23,42,.98));
+      color:#bbf7d0;
+      box-shadow:0 0 16px rgba(34,197,94,.9);
+    }
+
+    .badge-no-watch{
+      border:1px solid rgba(34,197,94,.95);
+      background:radial-gradient(circle at top,rgba(34,197,94,.5),rgba(15,23,42,.98));
+      color:#bbf7d0;
+      box-shadow:0 0 16px rgba(34,197,94,.9);
+    }
+
+    .badge-inactive{
+      border:1px solid rgba(248,113,113,.95);
+      background:radial-gradient(circle at top,rgba(248,113,113,.5),rgba(15,23,42,.98));
+      color:#fee2e2;
+      box-shadow:0 0 16px rgba(248,113,113,.9);
+    }
+
+    .badge-watch{
+      border:1px solid rgba(248,113,113,.95);
+      background:radial-gradient(circle at top,rgba(248,113,113,.5),rgba(15,23,42,.98));
+      color:#fee2e2;
+      box-shadow:0 0 16px rgba(248,113,113,.9);
+    }
+
+    .rank-pill{
+      display:inline-flex;align-items:center;gap:7px;
+      padding:4px 11px;border-radius:999px;
+      font-size:11px;text-transform:uppercase;letter-spacing:.18em;
+      background:rgba(15,23,42,.98);
+      border:1px solid rgba(148,163,184,.8);
+    }
+    .rank-number{
+      padding:2px 6px;border-radius:7px;font-size:10px;font-weight:700;
+      border:1px solid rgba(209,213,219,.9);
+      background:rgba(51,65,85,.9);color:#e5e7eb;
+    }
+    .rank-name{font-weight:600;color:#e5e7eb;}
+
+    .rank-9 .rank-pill,.rank-10 .rank-pill{
+      border-color:rgba(252,211,77,.95);
+      background:linear-gradient(135deg,rgba(55,48,163,1),rgba(30,64,175,1)),
+        radial-gradient(circle at top,rgba(250,204,21,.28),transparent 60%);
+      box-shadow:0 0 20px rgba(252,211,77,.9),0 0 28px rgba(147,51,234,.8);
+    }
+    .rank-9 .rank-number,.rank-10 .rank-number{
+      background:rgba(252,211,77,.3);border-color:rgba(252,211,77,1);color:#fef9c3;
+    }
+    .rank-10 .rank-pill::before{content:"👑";font-size:15px;}
+    .rank-9 .rank-pill::before{content:"★";font-size:13px;}
+
+    .name-glow{
+      color:#f9fafb;
+      text-shadow:0 0 6px rgba(248,250,252,.9),0 0 18px rgba(244,114,182,.95),0 0 32px rgba(168,85,247,.95);
+      animation:namePulse 1.6s ease-in-out infinite alternate;
+    }
+    @keyframes namePulse{
+      from{
+        text-shadow:0 0 6px rgba(248,250,252,.9),0 0 22px rgba(244,114,182,.95),0 0 36px rgba(168,85,247,.95);
+      }
+      to{
+        text-shadow:0 0 3px rgba(248,250,252,.8),0 0 12px rgba(244,114,182,.85),0 0 24px rgba(168,85,247,.85);
+      }
+    }
+
+    .footer-bar{
+      padding:10px 20px 12px;font-size:10px;letter-spacing:.16em;
+      color:rgba(148,163,184,.9);display:flex;justify-content:space-between;
+      border-top:1px solid rgba(51,65,85,.9);
+      background:radial-gradient(circle at top,rgba(15,23,42,.98),rgba(15,23,42,1));
+    }
+
+    .side-panel{
+      position:fixed;top:0;right:-360px;width:360px;height:100vh;
+      background:
+        linear-gradient(140deg,rgba(15,23,42,.98),rgba(30,64,175,.98)),
+        radial-gradient(circle at top left,rgba(236,72,153,.35),transparent 60%);
+      border-left:1px solid rgba(191,219,254,.75);
+      box-shadow:-20px 0 60px rgba(15,23,42,1);
+      padding:80px 20px 18px;
+      display:flex;flex-direction:column;gap:18px;
+      z-index:40;transition:right .28s ease-out;overflow-y:auto;
+    }
+    .side-panel::-webkit-scrollbar{width:6px;}
+    .side-panel::-webkit-scrollbar-track{background:transparent;}
+    .side-panel::-webkit-scrollbar-thumb{background:rgba(148,163,184,.8);border-radius:999px;}
+    body.menu-open .side-panel{right:0;}
+
+    .panel-section-title{font-size:12px;text-transform:uppercase;letter-spacing:.19em;color:rgba(248,250,252,.9);margin-bottom:6px;}
+    .panel-card{
+      border-radius:16px;padding:12px;
+      background:radial-gradient(circle at top left,rgba(30,64,175,.7),rgba(15,23,42,.96));
+      border:1px solid rgba(191,219,254,.4);
+      display:flex;flex-direction:column;gap:10px;
+      box-shadow:0 16px 30px rgba(15,23,42,.9);
+    }
+
+    .form-row{display:flex;flex-direction:column;gap:4px;margin-bottom:6px;}
+    .form-row label{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:rgba(241,245,249,.9);}
+    .form-row input,.form-row select{
+      padding:7px 9px;border-radius:9px;border:1px solid rgba(191,219,254,.75);
+      background:rgba(15,23,42,.97);color:#f9fafb;font-size:13px;outline:none;
+    }
+    .form-row input::placeholder{color:rgba(148,163,184,.9);}
+    .form-row input:focus,.form-row select:focus{border-color:rgba(45,212,191,.95);box-shadow:0 0 10px rgba(45,212,191,.7);}
+
+    .checkbox-row{display:flex;align-items:center;gap:8px;margin-top:4px;}
+    .checkbox-row input[type=checkbox]{width:16px;height:16px;accent-color:#22c55e;cursor:pointer;}
+    .small-note{font-size:11px;color:rgba(241,245,249,.85);}
+
+    .btn{
+      padding:7px 10px;border-radius:999px;border:none;cursor:pointer;
+      font-size:11px;text-transform:uppercase;letter-spacing:.15em;font-weight:600;
+      display:inline-flex;align-items:center;justify-content:center;gap:6px;
+      transition:transform .1s ease,box-shadow .1s ease,background .1s ease,opacity .1s ease;
+    }
+    .btn:active{transform:translateY(1px) scale(.97);box-shadow:none;opacity:.92;}
+    .btn-primary{background:linear-gradient(120deg,#22c55e,#67e8f9);color:#020617;box-shadow:0 0 16px rgba(45,212,191,.8);}
+    .btn-danger{background:linear-gradient(120deg,#ef4444,#fb7185);color:#020617;box-shadow:0 0 16px rgba(248,113,113,.9);}
+    .btn-secondary{
+      background:linear-gradient(120deg,#38bdf8,#a855f7);
+      color:#020617;
+      box-shadow:0 0 14px rgba(59,130,246,.8);
+    }
+
+    .menu-toggle-wrapper{position:fixed;top:18px;right:20px;z-index:50;}
+    .menu-toggle{
+      width:40px;height:34px;border-radius:999px;padding:7px 10px;
+      display:flex;flex-direction:column;justify-content:space-between;
+      cursor:pointer;
+      background:radial-gradient(circle at top,rgba(15,23,42,.98),rgba(15,23,42,.98));
+      border:1px solid rgba(148,163,184,.8);
+      box-shadow:0 0 18px rgba(129,140,248,.8),0 12px 28px rgba(15,23,42,1);
+      transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease,background .12s ease;
+    }
+    .menu-toggle span{display:block;height:2.6px;border-radius:999px;background:#f9fafb;transition:transform .22s ease,opacity .22s ease;}
+    .menu-toggle:hover{
+      transform:translateY(-1px) scale(1.02);
+      border-color:rgba(248,250,252,.9);
+      background:radial-gradient(circle at top,rgba(30,64,175,.98),rgba(15,23,42,.98));
+    }
+    body.menu-open .menu-toggle{
+      background:radial-gradient(circle at top,rgba(76,29,149,.98),rgba(15,23,42,.98));
+      box-shadow:0 0 20px rgba(196,181,253,.9),0 16px 36px rgba(15,23,42,1);
+    }
+    body.menu-open .menu-toggle .line1{transform:translateY(6.5px) rotate(45deg);}
+    body.menu-open .menu-toggle .line2{opacity:0;}
+    body.menu-open .menu-toggle .line3{transform:translateY(-6.5px) rotate(-45deg);}
+
+    .notification-bar{
+      position:fixed;top:18px;left:50%;
+      transform:translateX(-50%) translateY(-12px);
+      padding:8px 16px;border-radius:999px;
+      display:flex;align-items:center;gap:10px;
+      font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#f9fafb;
+      border:1px solid rgba(191,219,254,.9);
+      background:radial-gradient(circle at top left,rgba(30,64,175,.9),rgba(15,23,42,.98));
+      box-shadow:0 0 18px rgba(129,140,248,.9),0 12px 26px rgba(15,23,42,1);
+      opacity:0;pointer-events:none;z-index:60;
+      transition:opacity .18s ease,transform .18s ease;
+    }
+    .notification-bar.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+    .notification-icon{font-size:14px;}
+    .notification-close{border:none;background:transparent;color:#e5e7eb;font-size:14px;cursor:pointer;padding:0 2px;}
+    .notification-error{
+      border-color:rgba(248,113,113,.9);
+      background:radial-gradient(circle at top left,rgba(248,113,113,.9),rgba(15,23,42,.98));
+      box-shadow:0 0 18px rgba(248,113,113,.9),0 12px 26px rgba(15,23,42,1);
+    }
+    .notification-success{
+      border-color:rgba(34,197,94,.9);
+      background:radial-gradient(circle at top left,rgba(34,197,94,.9),rgba(15,23,42,.98));
+      box-shadow:0 0 18px rgba(34,197,94,.9),0 12px 26px rgba(15,23,42,1);
+    }
+
+    .login-overlay{
+      position:fixed;inset:0;
+      display:flex;align-items:center;justify-content:center;
+      background:radial-gradient(circle at top,#020617dd,#000000f0);
+      z-index:70;
+    }
+    .login-card{
+      max-width:420px;width:100%;
+      padding:24px 20px 18px;
+      border-radius:24px;
+      border:1px solid rgba(129,140,248,.8);
+      background:
+        radial-gradient(circle at top left,rgba(56,189,248,.2),transparent 60%),
+        linear-gradient(140deg,rgba(15,23,42,.98),rgba(30,64,175,.98));
+      box-shadow:0 24px 60px rgba(15,23,42,1),0 0 80px rgba(129,140,248,.8);
+    }
+    .login-title{
+      font-size:22px;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      margin-bottom:6px;
+    }
+    .login-subtitle{
+      font-size:13px;
+      color:rgba(209,213,219,.9);
+      margin-bottom:14px;
+    }
+    .login-hint{
+      margin-top:10px;
+      font-size:11px;
+      color:rgba(209,213,219,.85);
+      line-height:1.4;
+    }
+
+    /* Neuer Brand-Text im Login – besser sichtbar */
+    .login-brand{
+      margin-top:18px;
+      padding-top:10px;
+      border-top:1px solid rgba(148,163,184,.6);
+      font-size:12px;
+      font-weight:600;
+      text-align:center;
+      text-transform:uppercase;
+      letter-spacing:.22em;
+      color:#e5e7eb;
+      text-shadow:0 0 6px rgba(15,23,42,.9),0 0 14px rgba(96,165,250,.9);
+    }
+    .login-brand span{
+      font-weight:800;
+      background:linear-gradient(120deg,#38bdf8,#a855f7);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .login-manage-wrapper{
+      position:fixed;top:18px;left:20px;z-index:50;
+    }
+    .login-manage-pill{
+      padding:7px 14px;
+      border-radius:999px;
+      border:1px solid rgba(191,219,254,.9);
+      background:radial-gradient(circle at top,rgba(37,99,235,.98),rgba(15,23,42,.98));
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:#e5e7eb;
+      cursor:pointer;
+      box-shadow:0 0 18px rgba(59,130,246,.8),0 12px 26px rgba(15,23,42,1);
+      display:flex;align-items:center;gap:8px;
+    }
+
+    .login-panel{
+      position:fixed;
+      top:70px;
+      left:20px;
+      width:340px;
+      max-height:80vh;
+      padding:12px 12px 14px;
+      border-radius:18px;
+      border:1px solid rgba(191,219,254,.8);
+      background:
+        radial-gradient(circle at top left,rgba(236,72,153,.35),transparent 60%),
+        linear-gradient(140deg,rgba(15,23,42,.98),rgba(30,64,175,.98));
+      box-shadow:0 22px 50px rgba(15,23,42,1);
+      z-index:55;
+      display:none;
+      flex-direction:column;
+      gap:12px;
+      overflow-y:auto;
+    }
+    .login-panel.show{display:flex;}
+    .login-panel-close{
+      align-self:flex-end;
+      font-size:16px;
+      border:none;
+      background:transparent;
+      color:#e5e7eb;
+      cursor:pointer;
+      margin-top:-4px;
+      margin-bottom:4px;
+    }
+
+    @media(max-width:768px){
+      body{padding:24px 10px;}
+      .container{border-radius:20px;}
+      .header{padding:14px 16px 8px;}
+      .content{padding:14px 12px 14px;}
+      .side-panel{width:100%;right:-100%;}
+      body.menu-open .side-panel{right:0;}
+      .table-search{flex:1;}
+      .notification-bar{width:calc(100% - 40px);justify-content:space-between;}
+      .login-panel{
+        width:calc(100% - 40px);
+        left:50%;transform:translateX(-50%);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-card">
+    <h1 class="login-title">Ballas Login</h1>
+    <p class="login-subtitle">Bitte melde dich an, um das Member-Board zu bearbeiten.</p>
+    <form id="loginForm">
+      <div class="form-row">
+        <label for="loginUser">Benutzername</label>
+        <input id="loginUser" type="text" placeholder="Benutzernamen" required="">
+      </div>
+      <div class="form-row">
+        <label for="loginPassword">Passwort</label>
+        <input id="loginPassword" type="password" placeholder="Passwort" required="">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;">
+        Login
+      </button>
+    </form>
+    <p class="login-brand">
+      Designed and Powered by <span>Norbert Red</span> © 2025
+    </p>
+  </div>
+</div>
+
+<!-- Button oben links: Logins verwalten -->
+<div class="login-manage-wrapper auth-hidden" id="loginManageWrapper">
+  <button class="login-manage-pill" id="loginManageButton">
+    Logins
+  </button>
+</div>
+
+<!-- Menü Button rechts -->
+<div class="menu-toggle-wrapper auth-hidden" id="menuToggleWrapper">
+  <div class="menu-toggle" id="menuToggle" title="Roster verwalten">
+    <span class="line1"></span>
+    <span class="line2"></span>
+    <span class="line3"></span>
+  </div>
+</div>
+
+<div id="notification" class="notification-bar notification-error">
+  <span class="notification-icon" id="notificationIcon">⚠️</span>
+  <span id="notificationText">Login fehlgeschlagen.</span>
+  <button id="notificationClose" class="notification-close" aria-label="Schließen">×</button>
+</div>
+
+<!-- Seitenpanel: Memberverwaltung -->
+<div class="side-panel auth-hidden" id="sidePanel">
+  <!-- NEUEN BALLA -->
+  <div>
+    <div class="panel-section-title">Neuen Balla eintragen</div>
+    <div class="panel-card">
+      <form id="addForm">
+        <div class="form-row">
+          <label for="nameInput">Name</label>
+          <input id="nameInput" type="text" placeholder="z.B. Mia Parker" required="">
+        </div>
+        <div class="form-row">
+          <label for="idInput">ID</label>
+          <input id="idInput" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="z.B. 101968" required="">
+        </div>
+        <div class="form-row">
+          <label for="rankSelect">Rang</label>
+          <select id="rankSelect" required="">
+            <option value="">Rang wählen...</option>
+            <option value="1">1 · Snitch</option>
+            <option value="2">2 · Day One</option>
+            <option value="3">3 · Lil Homie</option>
+            <option value="4">4 · Turfer</option>
+            <option value="5">5 · Full Balla</option>
+            <option value="6">6 · Young Boss</option>
+            <option value="7">7 · Caller</option>
+            <option value="8">8 · Underboss</option>
+            <option value="9">9 · Vize OG</option>
+            <option value="10">10 · OG</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Neu im Set?</label>
+          <div class="checkbox-row">
+            <input id="newCheckbox" type="checkbox">
+            <span class="small-note">Anhaken, wenn frisch rekrutiert</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Status</label>
+          <div class="checkbox-row">
+            <input id="activeCheckbox" type="checkbox" checked="">
+            <span class="small-note">Aktiv (deaktivieren = Inaktiv)</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Unter Beobachtung?</label>
+          <div class="checkbox-row">
+            <input id="watchCheckbox" type="checkbox">
+            <span class="small-note">Anhaken, wenn unter Beobachtung</span>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:4px;">
+          + Hinzufügen
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MITGLIED BEARBEITEN -->
+  <div>
+    <div class="panel-section-title">Mitglied bearbeiten</div>
+    <div class="panel-card">
+      <form id="editForm">
+        <div class="form-row">
+          <label for="editSearch">Mitglied suchen</label>
+          <input id="editSearch" type="text" placeholder="Name oder ID...">
+        </div>
+        <div class="form-row">
+          <label for="editSelect">Mitglied wählen</label>
+          <select id="editSelect" required=""><option value="">ID / Name auswählen...</option></select>
+        </div>
+        <div class="form-row">
+          <label for="editRankSelect">Rang ändern</label>
+          <select id="editRankSelect" required="">
+            <option value="">Rang wählen...</option>
+            <option value="1">1 · Snitch</option>
+            <option value="2">2 · Day One</option>
+            <option value="3">3 · Lil Homie</option>
+            <option value="4">4 · Turfer</option>
+            <option value="5">5 · Full Balla</option>
+            <option value="6">6 · Young Boss</option>
+            <option value="7">7 · Caller</option>
+            <option value="8">8 · Underboss</option>
+            <option value="9">9 · Vize OG</option>
+            <option value="10">10 · OG</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Neu im Set?</label>
+          <div class="checkbox-row">
+            <input id="editNewCheckbox" type="checkbox">
+            <span class="small-note">Umstellen zwischen Neu / Stamm</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Status</label>
+          <div class="checkbox-row">
+            <input id="editActiveCheckbox" type="checkbox">
+            <span class="small-note">Aktiv / Inaktiv umstellen</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Unter Beobachtung?</label>
+          <div class="checkbox-row">
+            <input id="editWatchCheckbox" type="checkbox">
+            <span class="small-note">Unter Beobachtung ein/aus</span>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:4px;">
+          ✎ Änderungen speichern
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- BALLA AUSTRAGEN -->
+  <div>
+    <div class="panel-section-title">Balla austragen</div>
+    <div class="panel-card">
+      <form id="removeForm">
+        <div class="form-row">
+          <label for="removeSearch">Mitglied suchen</label>
+          <input id="removeSearch" type="text" placeholder="Name oder ID...">
+        </div>
+        <div class="form-row">
+          <label for="removeSelect">Mitglied wählen</label>
+          <select id="removeSelect" required=""><option value="">ID / Name auswählen...</option></select>
+        </div>
+        <button type="submit" class="btn btn-danger" style="width:100%;margin-top:4px;">
+          – Austragen
+        </button>
+      </form>
+      <p class="small-note">
+        Austragen entfernt den Eintrag dauerhaft aus der Tabelle.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN MANAGEMENT PANEL -->
+<div class="login-panel auth-hidden" id="loginPanel">
+  <button class="login-panel-close" id="loginPanelClose" title="Schließen">×</button>
+
+  <div>
+    <div class="panel-section-title">Neuen Login anlegen (Rang 2)</div>
+    <div class="panel-card">
+      <form id="addLoginForm">
+        <div class="form-row">
+          <label for="addLoginName">Benutzername</label>
+          <input id="addLoginName" type="text" placeholder="Name im Login" required="">
+        </div>
+        <div class="form-row">
+          <label for="addLoginPassword">Passwort</label>
+          <input id="addLoginPassword" type="password" placeholder="Passwort" required="">
+        </div>
+        <div class="form-row">
+          <label for="addLoginRank">Rang</label>
+          <select id="addLoginRank" required="">
+            <option value="">Rang wählen...</option>
+            <option value="1">Rang 1 · Tabelle</option>
+            <option value="2">Rang 2 · Logins anlegen</option>
+          </select>
+        </div>
+        <p class="small-note">
+          Rang&nbsp;2 darf neue Logins erstellen (nur für Rang&nbsp;1).<br>
+          Rang&nbsp;3 kann Ränge ändern, Passwörter setzen und Logins löschen.
+        </p>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:4px;">
+          + Login anlegen
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div>
+    <div class="panel-section-title">Logins verwalten (Rang 3)</div>
+    <div class="panel-card">
+      <form id="manageLoginForm">
+        <div class="form-row">
+          <label for="manageLoginSelect">Login auswählen</label>
+          <select id="manageLoginSelect" required="">
+            <option value="">Login wählen...</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="manageLoginRankSelect">Rang setzen</label>
+          <select id="manageLoginRankSelect">
+            <option value="1">Rang 1 · Tabelle</option>
+            <option value="2">Rang 2 · Logins anlegen</option>
+            <option value="3">Rang 3 · OG</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="manageLoginPassword">Neues Passwort (optional)</label>
+          <input id="manageLoginPassword" type="password" placeholder="Leer lassen = Passwort behalten">
+        </div>
+        <p class="small-note">
+          Nur Rang&nbsp;3 darf Ränge ändern, Passwörter setzen und Logins löschen.<br>
+          Die beiden OG-Logins (Mia Parker, Norbert Red) können nicht gelöscht und nicht unter Rang&nbsp;3 gesetzt werden.
+        </p>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:4px;">
+          ✎ Login speichern
+        </button>
+        <button type="button" class="btn btn-danger" style="width:100%;margin-top:6px;" id="deleteLoginButton">
+          – Login löschen
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="container auth-hidden" id="mainContainer">
+  <div class="inner">
+    <div class="header">
+      <div class="header-top">
+        <div class="title-block">
+          <div class="title">Ballas Member Liste</div>
+        </div>
+        <div class="header-badges">
+          <div class="user-pill auth-hidden" id="userInfoPill"></div>
+          <button class="btn btn-secondary auth-hidden" id="logoutButton">Logout</button>
+          <div class="status-pill">
+            <span class="status-dot"></span>
+            Live Board
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="table-card">
+        <div class="table-header-row">
+          <span>Ballas Member</span>
+          <div class="table-search">
+            <input id="searchInput" type="text" placeholder="Suche nach Name / ID / Rang...">
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table id="ballasTable">
+            <thead>
+            <tr>
+              <th>NAME</th>
+              <th>ID</th>
+              <th>RANG</th>
+              <th>NEU?</th>
+              <th>STATUS</th>
+              <th>BEOB.</th>
+            </tr>
+            </thead>
+            <tbody id="ballasTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span></span><span></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const tableBody = document.getElementById('ballasTableBody');
+
+  const DATA_URL_LOAD = 'load_ballas.php';
+  const DATA_URL_SAVE = 'save_ballas.php';
+  let isSyncing = false;
+
+  const menuToggle = document.getElementById('menuToggle');
+  const sidePanel = document.getElementById('sidePanel');
+  const mainContainer = document.getElementById('mainContainer');
+  const menuToggleWrapper = document.getElementById('menuToggleWrapper');
+
+  const addForm = document.getElementById('addForm');
+  const editForm = document.getElementById('editForm');
+  const removeForm = document.getElementById('removeForm');
+
+  const removeSelect = document.getElementById('removeSelect');
+  const editSelect = document.getElementById('editSelect');
+  const editRankSelect = document.getElementById('editRankSelect');
+  const editNewCheckbox = document.getElementById('editNewCheckbox');
+  const editActiveCheckbox = document.getElementById('editActiveCheckbox');
+  const editWatchCheckbox = document.getElementById('editWatchCheckbox');
+
+  const editSearchInput = document.getElementById('editSearch');
+  const removeSearchInput = document.getElementById('removeSearch');
+
+  const searchInput = document.getElementById('searchInput');
+
+  const notification = document.getElementById('notification');
+  const notificationText = document.getElementById('notificationText');
+  const notificationIcon = document.getElementById('notificationIcon');
+  const notificationClose = document.getElementById('notificationClose');
+
+  const RANK_NAMES = {
+    1:'Snitch',
+    2:'Day One',
+    3:'Lil Homie',
+    4:'Turfer',
+    5:'Full Balla',
+    6:'Young Boss',
+    7:'Caller',
+    8:'Underboss',
+    9:'Vize OG',
+    10:'OG'
+  };
+
+  const GLOW_NAMES = ['Mia Parker','Norbert Red'];
+
+  function toggleMenu(){document.body.classList.toggle('menu-open');}
+  if(menuToggle){menuToggle.addEventListener('click',toggleMenu);}
+
+  function showNotification(message,type='info'){
+    notificationText.textContent = message;
+    notification.classList.remove('notification-error','notification-success');
+    if(type==='error'){
+      notification.classList.add('notification-error');
+      notificationIcon.textContent = '⚠️';
+    }else if(type==='success'){
+      notification.classList.add('notification-success');
+      notificationIcon.textContent = '✅';
+    }else{
+      notificationIcon.textContent = 'ℹ️';
+    }
+    notification.classList.add('show');
+    if(notification._timeout) clearTimeout(notification._timeout);
+    notification._timeout = setTimeout(()=>notification.classList.remove('show'),3000);
+  }
+  notificationClose.addEventListener('click',()=>notification.classList.remove('show'));
+
+  /* ---------- LOGIN / USER MANAGEMENT (über PHP) ---------- */
+
+  let currentUser = null;
+  let loginUsers = [];
+
+  async function apiRequest(payload){
+    try{
+      const res = await fetch('auth.php',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      return await res.json();
+    }catch(e){
+      console.error(e);
+      showNotification('Server nicht erreichbar.','error');
+      return {success:false};
+    }
+  }
+
+  const loginOverlay = document.getElementById('loginOverlay');
+  const loginForm = document.getElementById('loginForm');
+  const loginUserInput = document.getElementById('loginUser');
+  const loginPasswordInput = document.getElementById('loginPassword');
+
+  const userInfoPill = document.getElementById('userInfoPill');
+  const logoutButton = document.getElementById('logoutButton');
+
+  const loginManageWrapper = document.getElementById('loginManageWrapper');
+  const loginManageButton = document.getElementById('loginManageButton');
+  const loginPanel = document.getElementById('loginPanel');
+  const loginPanelClose = document.getElementById('loginPanelClose');
+
+  const addLoginForm = document.getElementById('addLoginForm');
+  const addLoginName = document.getElementById('addLoginName');
+  const addLoginPassword = document.getElementById('addLoginPassword');
+  const addLoginRank = document.getElementById('addLoginRank');
+
+  const manageLoginForm = document.getElementById('manageLoginForm');
+  const manageLoginSelect = document.getElementById('manageLoginSelect');
+  const manageLoginRankSelect = document.getElementById('manageLoginRankSelect');
+  const manageLoginPasswordInput = document.getElementById('manageLoginPassword');
+  const deleteLoginButton = document.getElementById('deleteLoginButton');
+
+  function updateRoleUi(){
+    if(!currentUser) return;
+    const rank = currentUser.rank;
+
+    if(rank>=2){
+      loginManageWrapper.classList.remove('auth-hidden');
+    }else{
+      loginManageWrapper.classList.add('auth-hidden');
+      if(loginPanel) loginPanel.classList.remove('show');
+    }
+
+    const isRank3 = rank>=3;
+    if(manageLoginRankSelect) manageLoginRankSelect.disabled = !isRank3;
+    if(manageLoginPasswordInput) manageLoginPasswordInput.disabled = !isRank3;
+    if(deleteLoginButton) deleteLoginButton.disabled = !isRank3;
+  }
+
+  function setLoggedInUser(user){
+    currentUser = user;
+
+    if(user){
+      loginOverlay.classList.add('auth-hidden');
+      mainContainer.classList.remove('auth-hidden');
+      sidePanel.classList.remove('auth-hidden');
+      menuToggleWrapper.classList.remove('auth-hidden');
+      userInfoPill.classList.remove('auth-hidden');
+      logoutButton.classList.remove('auth-hidden');
+
+      userInfoPill.textContent = `${user.username} · Rang ${user.rank}`;
+      updateRoleUi();
+      showNotification(`Eingeloggt als ${user.username} (Rang ${user.rank}).`,'success');
+    }else{
+      mainContainer.classList.add('auth-hidden');
+      sidePanel.classList.add('auth-hidden');
+      menuToggleWrapper.classList.add('auth-hidden');
+      userInfoPill.classList.add('auth-hidden');
+      logoutButton.classList.add('auth-hidden');
+      loginManageWrapper.classList.add('auth-hidden');
+      if(loginPanel) loginPanel.classList.remove('show');
+      loginOverlay.classList.remove('auth-hidden');
+    }
+  }
+
+  async function loadLoginUsers(){
+    const result = await apiRequest({action:'list_users'});
+    if(result.success && Array.isArray(result.users)){
+      loginUsers = result.users;
+      refreshLoginSelect();
+    }else if(result.message){
+      showNotification(result.message,'error');
+    }
+  }
+
+  function refreshLoginSelect(){
+    if(!manageLoginSelect) return;
+    manageLoginSelect.innerHTML='';
+    const baseOpt=document.createElement('option');
+    baseOpt.value='';
+    baseOpt.textContent='Login wählen...';
+    manageLoginSelect.appendChild(baseOpt);
+
+    loginUsers.forEach(u=>{
+      const opt=document.createElement('option');
+      opt.value=u.username;
+      opt.textContent=`${u.username} (Rang ${u.rank})`;
+      manageLoginSelect.appendChild(opt);
+    });
+  }
+
+  loginForm.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const name = loginUserInput.value.trim();
+    const pw = loginPasswordInput.value;
+    if(!name || !pw){
+      showNotification('Bitte Benutzername und Passwort eingeben.','error');
+      return;
+    }
+
+    const res = await apiRequest({action:'login',username:name,password:pw});
+    if(!res.success){
+      showNotification(res.message || 'Login fehlgeschlagen.','error');
+      return;
+    }
+    loginPasswordInput.value='';
+    setLoggedInUser(res.user);
+  });
+
+  logoutButton.addEventListener('click',async ()=>{
+    await apiRequest({action:'logout'});
+    setLoggedInUser(null);
+    showNotification('Abgemeldet.','info');
+  });
+
+  if(loginManageButton){
+    loginManageButton.addEventListener('click',async ()=>{
+      if(!currentUser || currentUser.rank<2){
+        showNotification('Nur Rang 2 oder höher darf Logins sehen.','error');
+        return;
+      }
+      await loadLoginUsers();
+      if(loginPanel){
+        loginPanel.classList.toggle('show');
+      }
+    });
+  }
+
+  if(loginPanelClose){
+    loginPanelClose.addEventListener('click',()=>{
+      if(loginPanel) loginPanel.classList.remove('show');
+    });
+  }
+
+  if(addLoginForm){
+    addLoginForm.addEventListener('submit',async e=>{
+      e.preventDefault();
+      if(!currentUser || currentUser.rank<2){
+        showNotification('Nur Rang 2 oder höher darf neue Logins anlegen.','error');
+        return;
+      }
+      const name = addLoginName.value.trim();
+      const pw = addLoginPassword.value;
+      let rank = parseInt(addLoginRank.value,10);
+
+      if(!name || !pw || !rank){
+        showNotification('Bitte alle Login-Felder ausfüllen.','error');
+        return;
+      }
+
+      if(currentUser.rank===2 && rank>1){
+        rank = 1;
+      }
+
+      const res = await apiRequest({
+        action:'add_user',
+        username:name,
+        password:pw,
+        rank:rank
+      });
+
+      if(!res.success){
+        showNotification(res.message || 'Konnte Login nicht anlegen.','error');
+        return;
+      }
+      addLoginForm.reset();
+      await loadLoginUsers();
+      showNotification('Login angelegt.','success');
+    });
+  }
+
+  if(manageLoginSelect){
+    manageLoginSelect.addEventListener('change',()=>{
+      const name = manageLoginSelect.value;
+      const u = loginUsers.find(x=>x.username===name);
+      if(!u){
+        manageLoginRankSelect.value = '1';
+        manageLoginPasswordInput.value = '';
+        return;
+      }
+      manageLoginRankSelect.value = String(u.rank);
+      manageLoginPasswordInput.value = '';
+    });
+  }
+
+  if(manageLoginForm){
+    manageLoginForm.addEventListener('submit',async e=>{
+      e.preventDefault();
+      if(!currentUser || currentUser.rank<3){
+        showNotification('Nur Rang 3 darf Logins bearbeiten.','error');
+        return;
+      }
+      const name = manageLoginSelect.value;
+      if(!name){
+        showNotification('Bitte zuerst einen Login auswählen.','error');
+        return;
+      }
+      const newRank = parseInt(manageLoginRankSelect.value,10);
+      const newPw = manageLoginPasswordInput.value.trim();
+
+      const payload = {
+        action:'update_user',
+        username:name,
+        rank:newRank
+      };
+      if(newPw){
+        payload.password = newPw;
+      }
+
+      const res = await apiRequest(payload);
+      if(!res.success){
+        showNotification(res.message || 'Konnte Login nicht aktualisieren.','error');
+        return;
+      }
+      manageLoginPasswordInput.value='';
+      await loadLoginUsers();
+      showNotification('Login aktualisiert.','success');
+    });
+  }
+
+  if(deleteLoginButton){
+    deleteLoginButton.addEventListener('click',async e=>{
+      e.preventDefault();
+      if(!currentUser || currentUser.rank<3){
+        showNotification('Nur Rang 3 darf Logins löschen.','error');
+        return;
+      }
+      const name = manageLoginSelect.value;
+      if(!name){
+        showNotification('Bitte einen Login auswählen.','error');
+        return;
+      }
+      const res = await apiRequest({action:'delete_user',username:name});
+      if(!res.success){
+        showNotification(res.message || 'Konnte Login nicht löschen.','error');
+        return;
+      }
+      manageLoginPasswordInput.value='';
+      manageLoginSelect.value='';
+      await loadLoginUsers();
+      showNotification('Login gelöscht.','success');
+    });
+  }
+
+  /* ---------- REST: MEMBER / TABELLE ---------- */
+
+  function applyNameGlow(td,name){
+    if(GLOW_NAMES.includes(name.trim())) td.classList.add('name-glow');
+    else td.classList.remove('name-glow');
+  }
+
+  function updateNewCell(td,isNew){
+    td.innerHTML='';
+    const span=document.createElement('span');
+    if(isNew){span.className='badge-new';span.textContent='Neu';}
+    else{span.className='badge-not-new';span.textContent='Stamm';}
+    td.appendChild(span);
+  }
+
+  function updateActiveCell(td,isActive){
+    td.innerHTML='';
+    const span=document.createElement('span');
+    if(isActive){span.className='badge-active';span.textContent='Aktiv';}
+    else{span.className='badge-inactive';span.textContent='Inaktiv';}
+    td.appendChild(span);
+  }
+
+  function updateWatchCell(td,isWatch){
+    td.innerHTML='';
+    const span=document.createElement('span');
+    if(isWatch){span.className='badge-watch';span.textContent='Unter Beob.';}
+    else{span.className='badge-no-watch';span.textContent='Normal';}
+    td.appendChild(span);
+  }
+
+  function updateRankInRow(row,rank){
+    for(let i=1;i<=10;i++) row.classList.remove('rank-'+i);
+    row.classList.add('rank-'+rank);
+    const rn=row.querySelector('.rank-number');
+    const rname=row.querySelector('.rank-name');
+    if(rn) rn.textContent=rank.toString();
+    if(rname) rname.textContent=RANK_NAMES[rank]||'Unknown';
+  }
+
+  function sortRows(){
+    const rowsArray=Array.from(tableBody.querySelectorAll('tr'));
+    rowsArray.sort((a,b)=>{
+      const rankA=parseInt(a.querySelector('.rank-number')?.textContent||'0',10);
+      const rankB=parseInt(b.querySelector('.rank-number')?.textContent||'0',10);
+      if(rankA!==rankB) return rankB-rankA;
+      const nameA=(a.querySelector('.col-name')?.textContent||'').trim().toLowerCase();
+      const nameB=(b.querySelector('.col-name')?.textContent||'').trim().toLowerCase();
+      if(nameA<nameB) return -1;
+      if(nameA>nameB) return 1;
+      return 0;
+    });
+    rowsArray.forEach(r=>tableBody.appendChild(r));
+  }
+
+  function filterRows(query){
+    const q=query.trim().toLowerCase();
+    const rows=tableBody.querySelectorAll('tr');
+    rows.forEach(row=>{
+      const name=row.querySelector('.col-name')?.textContent.toLowerCase()||'';
+      const id=row.querySelector('.col-id')?.textContent.toLowerCase()||'';
+      const rankName=row.querySelector('.rank-name')?.textContent.toLowerCase()||'';
+      const match=!q || name.includes(q) || id.includes(q) || rankName.includes(q);
+      row.style.display=match?'':'none';
+    });
+  }
+  searchInput.addEventListener('input',e=>filterRows(e.target.value));
+
+  function filterSelectOptions(selectEl,query){
+    const q=query.trim().toLowerCase();
+    const options=Array.from(selectEl.options);
+    options.forEach((opt,index)=>{
+      if(index===0){opt.hidden=false;return;}
+      const text=opt.textContent.toLowerCase();
+      opt.hidden = q && !text.includes(q);
+    });
+  }
+  editSearchInput.addEventListener('input',()=>filterSelectOptions(editSelect,editSearchInput.value));
+  removeSearchInput.addEventListener('input',()=>filterSelectOptions(removeSelect,removeSearchInput.value));
+
+  function refreshSelects(){
+    const rows=tableBody.querySelectorAll('tr');
+    const base='<option value="">ID / Name auswählen...</option>';
+    removeSelect.innerHTML=base;
+    editSelect.innerHTML=base;
+
+    rows.forEach(row=>{
+      const id=row.getAttribute('data-id');
+      const name=row.querySelector('.col-name')?.textContent||'';
+      const rankName=row.querySelector('.rank-name')?.textContent||'';
+      const text=`ID ${id} · ${name} (${rankName})`;
+      const o1=document.createElement('option');
+      o1.value=id;o1.textContent=text;removeSelect.appendChild(o1);
+      const o2=document.createElement('option');
+      o2.value=id;o2.textContent=text;editSelect.appendChild(o2);
+    });
+
+    filterSelectOptions(editSelect,editSearchInput.value);
+    filterSelectOptions(removeSelect,removeSearchInput.value);
+  }
+
+  function createRow(name,id,rank,isNew,isActive,isWatch){
+    const tr=document.createElement('tr');
+    tr.classList.add('rank-'+rank);
+    tr.setAttribute('data-id',id);
+
+    const tdName=document.createElement('td');
+    tdName.className='col-name';
+    tdName.textContent=name;
+    applyNameGlow(tdName,name);
+
+    const tdId=document.createElement('td');
+    tdId.className='col-id';
+    tdId.textContent=id;
+
+    const tdRank=document.createElement('td');
+    const rankPill=document.createElement('div');
+    rankPill.className='rank-pill';
+    const rn=document.createElement('span');
+    rn.className='rank-number';
+    rn.textContent=rank.toString();
+    const rname=document.createElement('span');
+    rname.className='rank-name';
+    rname.textContent=RANK_NAMES[rank]||'Unknown';
+    rankPill.appendChild(rn);rankPill.appendChild(rname);
+    tdRank.appendChild(rankPill);
+
+    const tdNew=document.createElement('td');
+    updateNewCell(tdNew,isNew);
+
+    const tdActive=document.createElement('td');
+    updateActiveCell(tdActive,isActive);
+
+    const tdWatch=document.createElement('td');
+    updateWatchCell(tdWatch,isWatch);
+
+    tr.appendChild(tdName);
+    tr.appendChild(tdId);
+    tr.appendChild(tdRank);
+    tr.appendChild(tdNew);
+    tr.appendChild(tdActive);
+    tr.appendChild(tdWatch);
+
+    return tr;
+  }
+
+  function collectMembersFromTable(){
+    const rows = Array.from(tableBody.querySelectorAll('tr'));
+    return rows.map(row => {
+      const name = row.querySelector('.col-name')?.textContent.trim() || '';
+      const id = row.getAttribute('data-id') || '';
+      const rank = parseInt(row.querySelector('.rank-number')?.textContent || '1',10);
+      const isNew = !!row.querySelector('.badge-new');
+      const isActive = !!row.querySelector('.badge-active');
+      const isWatch = !!row.querySelector('.badge-watch');
+      return {name,id,rank,isNew,isActive,isWatch};
+    });
+  }
+
+  function syncToServer(showMessages = false){
+    const members = collectMembersFromTable();
+    if(isSyncing) return;
+    isSyncing = true;
+    fetch(DATA_URL_SAVE,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({members})
+    })
+      .then(r=>{
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        return r.json().catch(()=> ({}));
+      })
+      .then(res=>{
+        if(showMessages){
+          if(res && res.status==='ok'){
+            showNotification('Liste gespeichert.','success');
+          }else{
+            showNotification('Gespeichert, aber Antwort vom Server war ungewöhnlich.','info');
+          }
         }
-
-        var currentSession = null;
-
-        // DIESE FUNKTION WIRD JETZT GARANTIERT GEFUNDEN
-        function handleLogin() {
-            var user = document.getElementById('loginUser').value.trim();
-            var pass = document.getElementById('loginPassword').value.trim();
-
-            if (!user || !pass) { return alert("Bitte Logindaten eingeben!"); }
-
-            var accounts = JSON.parse(localStorage.getItem('ballas_accounts'));
-            var found = accounts.find(a => m_clean(a.name) === m_clean(user) && a.password === pass);
-
-            if (!found) { return alert("Falscher Benutzername oder falsches Passwort! Hinweis: Nutze Unterstriche wie Mia_Parker."); }
-
-            currentSession = found;
-
-            document.getElementById('authArea').classList.add('hidden');
-            document.getElementById('dashboardArea').classList.remove('hidden');
-            document.getElementById('mainTitle').innerText = currentSession.name + " · Board";
-            document.getElementById('roleDisplay').innerText = currentSession.rang === "Admin" ? "Rang 2 · Admin" : "Rang 1 · Member";
-
-            if (currentSession.rang === "Admin") {
-                document.getElementById('adminGrid').classList.remove('hidden');
-                document.getElementById('thAction').classList.remove('hidden');
-            } else {
-                document.getElementById('adminGrid').classList.add('hidden');
-                document.getElementById('thAction').classList.add('hidden');
-            }
-
-            updateUI();
+      })
+      .catch(err=>{
+        console.error(err);
+        if(showMessages){
+          showNotification('Konnte nicht auf dem Server speichern.','error');
         }
+      })
+      .finally(()=>{isSyncing=false;});
+  }
 
-        function updateUI() {
-            var accounts = JSON.parse(localStorage.getItem('ballas_accounts')) || [];
-            var tableBody = document.getElementById('memberTableBody');
-            var selectMenu = document.getElementById('selectManageMember');
-            
-            if (!tableBody || !selectMenu) return;
-            
-            tableBody.innerHTML = "";
-            selectMenu.innerHTML = '<option value="">ID / Name auswählen...</option>';
+  tableBody.addEventListener('click', (e) => {
+    const nameCell = e.target.closest('.col-name');
+    if (!nameCell) return;
 
-            accounts.forEach(a => {
-                var tr = document.createElement('tr');
-                var actionCell = currentSession.rang === "Admin" ? `<td><button class="btn-pay" onclick="clearPayout('${a.name}')">Ausgezahlt</button></td>` : '';
-                
-                tr.innerHTML = `
-                    <td><strong>${a.name}</strong></td>
-                    <td><span class="${a.rang === 'Admin' ? 'badge-admin' : 'badge-member'}">${a.rang}</span></td>
-                    <td style="color:#22c55e; font-weight:bold;">$${(a.events || 0).toLocaleString('de-DE')}</td>
-                    ${actionCell}
-                `;
-                tableBody.appendChild(tr);
+    const row = nameCell.closest('tr');
+    if (!row) return;
 
-                if (m_clean(a.name) !== m_clean(currentSession.name)) {
-                    var opt = document.createElement('option');
-                    opt.value = a.name;
-                    opt.innerText = a.name;
-                    selectMenu.appendChild(opt);
-                }
-            });
+    const id = row.getAttribute('data-id');
+    if (!id) return;
 
-            var foundSelf = accounts.find(a => m_clean(a.name) === m_clean(currentSession.name));
-            document.getElementById('userTotal').innerText = "$" + (foundSelf ? foundSelf.events || 0 : 0).toLocaleString('de-DE');
+    document.body.classList.add('menu-open');
+    editSelect.value = id;
+    editSelect.dispatchEvent(new Event('change'));
+  });
+
+  const idInputField = document.getElementById('idInput');
+  idInputField.addEventListener('input', () => {
+    idInputField.value = idInputField.value.replace(/\D/g, '');
+  });
+
+  function requireRank(minRank){
+    if(!currentUser || (currentUser.rank||0)<minRank){
+      showNotification(`Nur Rang ${minRank} oder höher darf das.`,`error`);
+      return false;
+    }
+    return true;
+  }
+
+  addForm.addEventListener('submit',e=>{
+    e.preventDefault();
+    if(!requireRank(1)) return;
+
+    const name=document.getElementById('nameInput').value.trim();
+    const id=document.getElementById('idInput').value.trim();
+    const rank=parseInt(document.getElementById('rankSelect').value,10);
+    const isNew=document.getElementById('newCheckbox').checked;
+    const isActive=document.getElementById('activeCheckbox').checked;
+    const isWatch=document.getElementById('watchCheckbox').checked;
+
+    if(!name || !id || !rank){
+      showNotification('Bitte Name, ID und Rang ausfüllen.','error');
+      return;
+    }
+
+    if(!/^[0-9]+$/.test(id)){
+      showNotification('ID darf nur aus Zahlen bestehen.','error');
+      return;
+    }
+
+    const existingSameName = Array.from(tableBody.querySelectorAll('.col-name'))
+      .some(td => td.textContent.trim().toLowerCase() === name.toLowerCase());
+    if(existingSameName){
+      showNotification('Dieser Name existiert bereits in der Liste.','error');
+      return;
+    }
+
+    if(tableBody.querySelector(`tr[data-id="${id}"]`)){
+      showNotification('Diese ID existiert bereits in der Liste.','error');
+      return;
+    }
+
+    const row=createRow(name,id,rank,isNew,isActive,isWatch);
+    tableBody.appendChild(row);
+
+    sortRows();
+    refreshSelects();
+    filterRows(searchInput.value);
+
+    addForm.reset();
+    document.getElementById('activeCheckbox').checked=true;
+    showNotification('Member hinzugefügt.','success');
+
+    syncToServer(false);
+  });
+
+  editSelect.addEventListener('change',()=>{
+    const id=editSelect.value;
+    if(!id){
+      editRankSelect.value='';
+      editNewCheckbox.checked=false;
+      editActiveCheckbox.checked=false;
+      editWatchCheckbox.checked=false;
+      return;
+    }
+    const row=tableBody.querySelector(`tr[data-id="${id}"]`);
+    if(!row){
+      editRankSelect.value='';
+      editNewCheckbox.checked=false;
+      editActiveCheckbox.checked=false;
+      editWatchCheckbox.checked=false;
+      return;
+    }
+
+    const rn=row.querySelector('.rank-number');
+    const currentRank=rn?parseInt(rn.textContent,10):null;
+    editRankSelect.value=currentRank?String(currentRank):'';
+
+    const isNew=!!row.querySelector('.badge-new');
+    editNewCheckbox.checked=isNew;
+
+    const isActive=!!row.querySelector('.badge-active');
+    editActiveCheckbox.checked=isActive;
+
+    const isWatch=!!row.querySelector('.badge-watch');
+    editWatchCheckbox.checked=isWatch;
+  });
+
+  editForm.addEventListener('submit',e=>{
+    e.preventDefault();
+    if(!requireRank(1)) return;
+
+    const id=editSelect.value;
+    const newRank=parseInt(editRankSelect.value,10);
+    const isNew=editNewCheckbox.checked;
+    const isActive=editActiveCheckbox.checked;
+    const isWatch=editWatchCheckbox.checked;
+
+    if(!id || !newRank){
+      showNotification('Bitte Mitglied und Rang wählen.','error');
+      return;
+    }
+
+    const row=tableBody.querySelector(`tr[data-id="${id}"]`);
+    if(!row){
+      showNotification('Member nicht gefunden.','error');
+      return;
+    }
+
+    updateRankInRow(row,newRank);
+    updateNewCell(row.children[3],isNew);
+    updateActiveCell(row.children[4],isActive);
+    updateWatchCell(row.children[5],isWatch);
+
+    sortRows();
+    refreshSelects();
+    filterRows(searchInput.value);
+
+    showNotification('Eintrag aktualisiert.','success');
+
+    syncToServer(false);
+  });
+
+  removeForm.addEventListener('submit',e=>{
+    e.preventDefault();
+    if(!requireRank(1)) return;
+
+    const id=removeSelect.value;
+    if(!id){
+      showNotification('Bitte wähle einen Member aus.','error');
+      return;
+    }
+    const row=tableBody.querySelector(`tr[data-id="${id}"]`);
+    if(!row){
+      showNotification('Member nicht gefunden.','error');
+      return;
+    }
+    tableBody.removeChild(row);
+    sortRows();
+    refreshSelects();
+    filterRows(searchInput.value);
+    showNotification('Member ausgetragen.','success');
+
+    syncToServer(false);
+  });
+
+  function loadFromServer(){
+    fetch(DATA_URL_LOAD)
+      .then(r=>{
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        return r.json();
+      })
+      .then(data=>{
+        const members = Array.isArray(data.members) ? data.members : [];
+        tableBody.innerHTML='';
+        members.forEach(m=>{
+          const row = createRow(
+            m.name || '',
+            m.id || '',
+            parseInt(m.rank,10) || 1,
+            !!m.isNew,
+            !!m.isActive,
+            !!m.isWatch
+          );
+          tableBody.appendChild(row);
+        });
+        sortRows();
+        refreshSelects();
+        filterRows(searchInput.value);
+        if(members.length){
+          showNotification('Gespeicherte Daten geladen.','success');
         }
+      })
+      .catch(err=>{
+        console.error(err);
+        refreshSelects();
+        showNotification('Konnte Daten nicht laden (eventuell noch keine Datei).','info');
+      });
+  }
 
-        function addEvent() {
-            var time = document.getElementById('eventTime').value;
-            var select = document.getElementById('eventType');
-            var amount = parseInt(select.value);
+  setLoggedInUser(null);
+  loadFromServer();
+</script>
 
-            if (!time) { return alert("Bitte Uhrzeit eintragen!"); }
 
-            var accounts = JSON.parse(localStorage.getItem('ballas_accounts'));
-            var index = accounts.findIndex(a => m_clean(a.name) === m_clean(currentSession.name));
-            
-            if (index !== -1) {
-                accounts[index].events = (accounts[index].events || 0) + amount;
-            }
-
-            localStorage.setItem('ballas_accounts', JSON.stringify(accounts));
-            updateUI();
-            document.getElementById('eventTime').value = "";
-            alert("Aktivität erfolgreich verbucht!");
-        }
-
-        function addMember() {
-            var name = document.getElementById('newBallaName').value.trim();
-            var pass = document.getElementById('newBallaPassword').value.trim();
-            var rang = document.getElementById('newBallaRang').value;
-
-            if (!name || !pass) { return alert("Bitte alle Felder ausfüllen!"); }
-
-            var accounts = JSON.parse(localStorage.getItem('ballas_accounts'));
-            if (accounts.some(a => m_clean(a.name) === m_clean(name))) { return alert("Dieser Benutzername existiert bereits!"); }
-
-            accounts.push({ name: name, password: pass, rang: rang, events: 0 });
-            localStorage.setItem('ballas_accounts', JSON.stringify(accounts));
-            
-            updateUI();
-            document.getElementById('newBallaName').value = "";
-            document.getElementById('newBallaPassword').value = "";
-            alert("Neues Mitglied erfolgreich im Set angelegt!");
-        }
-
-        function deleteMember() {
-            var targetName = document.getElementById('selectManageMember').value;
-            if (!targetName) return alert("Wähle ein Mitglied aus!");
-            
-            if (confirm(`Möchtest du ${targetName} wirklich dauerhaft aus dem Set austragen?`)) {
-                var accounts = JSON.parse(localStorage.getItem('ballas_accounts'));
-                accounts = accounts.filter(a => a.name !== targetName);
-                localStorage.setItem('ballas_accounts', JSON.stringify(accounts));
-                updateUI();
-                alert("Mitglied erfolgreich ausgetragen.");
-            }
-        }
-
-        function clearPayout(targetName) {
-            if (confirm(`Auszahlung für ${targetName} bestätigen und auf $0 zurücksetzen?`)) {
-                var accounts = JSON.parse(localStorage.getItem('ballas_accounts'));
-                var index = accounts.findIndex(a => m_clean(a.name) === m_clean(targetName));
-                if (index !== -1) {
-                    accounts[index].events = 0;
-                }
-                localStorage.setItem('ballas_accounts', JSON.stringify(accounts));
-                updateUI();
-            }
-        }
-
-        function m_clean(str) { return str.toLowerCase().replace(/[^a-z0-9_]/g, ""); }
-        function logout() { location.reload(); }
-    </script>
-
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-
-        body {
-            min-height: 100vh;
-            background: radial-gradient(circle at top, #a855f7 0, #1f2937 35%, #020617 75%, #000);
-            color: #f9fafb;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 32px 16px;
-            overflow-x: hidden;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1100px;
-            background: radial-gradient(circle at top left, rgba(15,23,42,.95), rgba(15,23,42,.93));
-            border-radius: 26px;
-            border: 1px solid rgba(129,140,248,.5);
-            box-shadow: 0 20px 60px rgba(15,23,42,.95), 0 0 80px rgba(168,85,247,.35);
-            backdrop-filter: blur(20px);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .header {
-            padding: 18px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(148,163,184,.35);
-            background: linear-gradient(115deg, rgba(15,23,42,.96), rgba(30,64,175,.96));
-        }
-
-        .title {
-            font-size: 24px;
-            letter-spacing: .14em;
-            text-transform: uppercase;
-            font-weight: 800;
-            color: #e5e7eb;
-            text-shadow: 0 0 10px rgba(248,250,252,.7), 0 0 32px rgba(129,140,248,.8);
-        }
-
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 11px;
-            border-radius: 999px;
-            background: rgba(15,23,42,.88);
-            border: 1px solid rgba(148,163,184,.8);
-            color: #e5e7eb;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: .16em;
-        }
-
-        .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 12px #a855f7; }
-
-        .content { padding: 20px; }
-        
-        .management-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        @media(min-width: 768px) {
-            .management-grid { grid-template-columns: 1fr 1fr; }
-        }
-
-        .card {
-            border-radius: 20px;
-            background: rgba(15,23,42,.6);
-            border: 1px solid rgba(129,140,248,.3);
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
-        }
-
-        h2, h3 { color: #da70d6; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 15px; font-size: 18px; }
-
-        .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 6px; font-size: 12px; color: #94a3b8; text-transform: uppercase; }
-        
+</body></html>
