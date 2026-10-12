@@ -4,9 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grand RP DE 03 - Family Payout Tracker</title>
-    <!-- Firebase SDKs DIREKT REPARIERT -->
-    <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js"></script>
+    <!-- Firebase SDKs im modernen Modul-Format perfekt vordefiniert -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+        import { getDatabase, ref, set, get, child, onValue, remove } from "https://gstatic.com";
+
+        // Deine echten Projektdaten aus Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlxKrv4KtPqUKwpVK8Umzz-AzaBxFWQsI",
+            authDomain: "grandrp-tracker.firebaseapp.com",
+            databaseURL: "https://grandrp-tracker-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "grandrp-tracker",
+            storageBucket: "grandrp-tracker.firebasestorage.app",
+            messagingSenderId: "538153636196",
+            appId: "1:538153636196:web:a6d52f03b606ae5b7daa71"
+        };
+
+        // Datenbank-Instanz initialisieren
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Verknuepft die Kernfunktionen direkt mit den HTML-Buttons
+        window.db = db;
+        window.ref = ref;
+        window.set = set;
+        window.get = get;
+        window.child = child;
+        window.onValue = onValue;
+        window.remove = remove;
+        
+        // Logik-Funktionen laden, sobald die Verbindung steht
+        initializeLogic();
+    </script>
     
     <style>
         body {
@@ -251,26 +280,16 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDlxKrv4KtPqUKwpVK8Umzz-AzaBxFWQsI",
-            authDomain: "grandrp-tracker.firebaseapp.com",
-            databaseURL: "https://grandrp-tracker-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "grandrp-tracker",
-            storageBucket: "grandrp-tracker.firebasestorage.app",
-            messagingSenderId: "538153636196",
-            appId: "1:538153636196:web:a6d52f03b606ae5b7daa71"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
         let currentUserId = localStorage.getItem('grand_rp_user_id') || null;
         let userData = null;
 
-        if (currentUserId) {
-            checkLoginState();
+        function initializeLogic() {
+            if (currentUserId) {
+                checkLoginState();
+            }
         }
 
+        // REGISTRIEREN
         function handleRegister() {
             const username = document.getElementById('authUsername').value.trim();
             const icId = document.getElementById('authID').value.trim();
@@ -283,33 +302,15 @@
 
             const cleanKey = (username + "_" + icId).replace(/[^a-zA-Z0-9_]/g, "");
 
-            db.ref('users/' + cleanKey).once('value', snapshot => {
+            const userRef = window.ref(window.db, 'users/' + cleanKey);
+            window.get(userRef).then(snapshot => {
                 if (snapshot.exists()) {
                     alert("Konto existiert bereits! Klicke auf 'Einloggen'.");
                 } else {
-                    db.ref('users').once('value', usersSnap => {
+                    const allUsersRef = window.ref(window.db, 'users');
+                    window.get(allUsersRef).then(usersSnap => {
                         const role = usersSnap.exists() ? "Mitglied" : "Chef";
                         
                         const newProfile = {
                             username: username,
                             icId: icId,
-                            phone: phone,
-                            role: role
-                        };
-
-                        db.ref('users/' + cleanKey).set(newProfile, error => {
-                            if(!error) {
-                                localStorage.setItem('grand_rp_user_id', cleanKey);
-                                currentUserId = cleanKey;
-                                checkLoginState();
-                            } else {
-                                alert("Datenbank-Fehler: " + error.message);
-                            }
-                        });
-                    });
-                }
-            });
-        }
-
-        function handleLogin() {
-            const username = document.getElementById('authUsername').value.trim();
