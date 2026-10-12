@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grand RP DE 03 - Family Payout Tracker</title>
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs DIREKT REPARIERT -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
     
@@ -251,9 +251,6 @@
     </div>
 
     <script>
-        // ################################################################
-        // SCHRITT 2: ERSETZE DIE ZEILEN HIER UNTEN MIT DEINEM BLOCK AUS FIREBASE
-        // ################################################################
         const firebaseConfig = {
             apiKey: "AIzaSyDlxKrv4KtPqUKwpVK8Umzz-AzaBxFWQsI",
             authDomain: "grandrp-tracker.firebaseapp.com",
@@ -263,7 +260,6 @@
             messagingSenderId: "538153636196",
             appId: "1:538153636196:web:a6d52f03b606ae5b7daa71"
         };
-        // ################################################################
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -281,7 +277,7 @@
             const phone = document.getElementById('authPhone').value.trim();
 
             if (!username || !icId || !phone) {
-                alert("Bitte alle drei Felder (Name, ID und Telefonnummer) ausfüllen, um ein Konto zu erstellen!");
+                alert("Bitte alle drei Felder ausfüllen, um ein Konto zu erstellen!");
                 return;
             }
 
@@ -308,3 +304,12 @@
                                 checkLoginState();
                             } else {
                                 alert("Datenbank-Fehler: " + error.message);
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('authUsername').value.trim();
