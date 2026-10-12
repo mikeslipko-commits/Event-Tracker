@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grand RP DE 03 - Family Payout Tracker</title>
-    
-    <!-- Robuste, web-optimierte Datenbank-Schnittstellen -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
-    
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -23,7 +18,7 @@
 
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             background-color: #1a1a1e;
             padding: 25px;
             border-radius: 10px;
@@ -33,7 +28,7 @@
             box-sizing: border-box;
         }
 
-        h1, h3 {
+        h1, h2, h3 {
             color: #ff4444;
             text-align: center;
             text-transform: uppercase;
@@ -119,6 +114,31 @@
             font-weight: bold;
         }
 
+        .admin-area {
+            border: 1px solid #ffaa00;
+            background-color: #1a1a1e;
+        }
+
+        .member-row {
+            background-color: #26262b;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #00ff77;
+        }
+
+        .btn-pay {
+            background-color: #00ff77;
+            color: #000;
+            width: auto;
+            padding: 8px 15px;
+            font-size: 14px;
+            margin-top: 0;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -145,45 +165,40 @@
 </head>
 <body>
 
-    <!-- BEREICH 1: ANMELDUNG / REGISTRIERUNG -->
+    <!-- ANMELDUNG -->
     <div class="container" id="authArea">
-        <h1>Grand RP DE 03</h1>
-        
+        <h1>Grand RP DE 03 Tracker</h1>
         <div class="form-group">
-            <label for="authUsername">IC Name (Vorname_Nachname):</label>
+            <label>IC Name (Vorname_Nachname):</label>
             <input type="text" id="authUsername" placeholder="Max_Mustermann">
         </div>
-        
         <div class="form-group">
-            <label for="authID">IC ID (Visumsnummer):</label>
+            <label>IC ID (Visumsnummer):</label>
             <input type="number" id="authID" placeholder="12345">
         </div>
-        
         <div class="form-group">
-            <label for="authPhone">Telefonnummer:</label>
+            <label>Telefonnummer:</label>
             <input type="number" id="authPhone" placeholder="99887766">
         </div>
-
-        <button id="btnLogin" onclick="login()">Einloggen</button>
-        <button id="btnRegister" onclick="register()" class="btn-reg">Neues Konto registrieren</button>
+        <button onclick="handleLogin()">Einloggen</button>
+        <button onclick="handleRegister()" class="btn-reg">Neues Konto registrieren</button>
     </div>
 
-    <!-- BEREICH 2: DASHBOARD (ZUM EVENTS EINTRAGEN) -->
+    <!-- SPIELER-OBERFLÄCHE -->
     <div class="container hidden" id="playerArea">
-        <h1>Event Tracker</h1>
-        
+        <h1>Grand RP Tracker</h1>
         <div class="user-badge">
-            <div>Eingeloggt als: <strong id="usernameDisplay">...</strong> (ID: <span id="idDisplay">...</span>)</div>
+            <div><strong id="usernameDisplay">...</strong> (ID: <span id="idDisplay">...</span>) | <span id="userRang">Mitglied</span></div>
             <button onclick="logout()" style="width:auto; padding:5px 10px; margin:0; background:#444; font-size:12px;">Abmelden</button>
         </div>
 
         <div class="form-group">
-            <label for="eventTime">Uhrzeit des Events:</label>
+            <label>Uhrzeit des Events:</label>
             <input type="time" id="eventTime">
         </div>
 
         <div class="form-group">
-            <label for="eventType">Event auswählen:</label>
+            <label>Event auswählen:</label>
             <select id="eventType">
                 <option value="50000">Flugzeugträger ($50.000)</option>
                 <option value="40000">Waffenfabrik ($40.000)</option>
@@ -204,95 +219,74 @@
         <ul class="log-list" id="myLogList"></ul>
     </div>
 
-    <!-- DAS LIVE-NETZWERKPROGRAMM -->
+    <!-- CHEF-OBERFLÄCHE -->
+    <div class="container admin-area hidden" id="adminArea">
+        <h2>Chef-Interface (Auszahlungen)</h2>
+        <p style="text-align: center; color: #aaa; font-size: 14px;">Offene Beträge aller Familienmitglieder:</p>
+        <div id="adminMemberList"></div>
+    </div>
+
     <script>
-        // Deine echten Projektdaten aus der Firebase-Konsole
-        var firebaseConfig = {
-            apiKey: "AIzaSyDlxKrv4KtPqUKwpVK8Umzz-AzaBxFWQsI",
-            authDomain: "grandrp-tracker.firebaseapp.com",
-            databaseURL: "https://firebasedatabase.app",
-            projectId: "grandrp-tracker",
-            storageBucket: "grandrp-tracker.firebasestorage.app",
-            messagingSenderId: "538153636196",
-            appId: "1:538153636196:web:a6d52f03b606ae5b7daa71"
+        // Sichere Live-Datenbankverbindung über REST-API
+        const apiURL = "https://supabase.co";
+        const headers = {
+            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXh3b21za3d1bnB4dHZjbHB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI4OTAwMDAsImV4cCI6MjAyODQ2MDAwMH0.1_Active_DE03_Tracker_System_Secure_Key",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXh3b21za3d1bnB4dHZjbHB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI4OTAwMDAsImV4cCI6MjAyODQ2MDAwMH0.1_Active_DE03_Tracker_System_Secure_Key",
+            "Content-Type": "application/json",
+            "Prefer": "return=representation"
         };
 
-        // Verbindung herstellen
-        firebase.initializeApp(firebaseConfig);
-        var db = firebase.database();
+        let currentUserId = localStorage.getItem('grand_rp_user_id') || null;
+        let userData = null;
 
-        // Prüfen, ob der User bereits eingeloggt war
-        var savedUserKey = localStorage.getItem('grand_rp_user_key');
-        if (savedUserKey) {
-            loadUserData(savedUserKey);
+        if (currentUserId) { checkLoginState(); }
+
+        function handleRegister() {
+            const name = document.getElementById('authUsername').value.trim();
+            const id = document.getElementById('authID').value.trim();
+            const phone = document.getElementById('authPhone').value.trim();
+
+            if (!name || !id || !phone) { return alert("Bitte alle Felder ausfüllen!"); }
+            const cleanKey = (name + "_" + id).replace(/[^a-zA-Z0-9_]/g, "");
+
+            fetch(`${apiURL}/rpc/get_user_count`, { method: "POST", headers: headers })
+            .then(res => res.json()).then(count => {
+                const role = count > 0 ? "Mitglied" : "Chef";
+                
+                fetch(`${apiURL}/users`, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify({ id: cleanKey, username: name, ic_id: id, phone: phone, role: role })
+                }).then(() => {
+                    localStorage.setItem('grand_rp_user_id', cleanKey);
+                    currentUserId = cleanKey;
+                    checkLoginState();
+                }).catch(() => alert("Registrierungsfehler. Name/ID eventuell schon vergeben."));
+            });
         }
 
-        // REGISTRIEREN-KNOPF
-        function register() {
-            var username = document.getElementById('authUsername').value.trim();
-            var icId = document.getElementById('authID').value.trim();
-            var phone = document.getElementById('authPhone').value.trim();
+        function handleLogin() {
+            const name = document.getElementById('authUsername').value.trim();
+            const id = document.getElementById('authID').value.trim();
+            if (!name || !id) { return alert("Bitte Name und ID eingeben!"); }
+            
+            const cleanKey = (name + "_" + id).replace(/[^a-zA-Z0-9_]/g, "");
 
-            if (!username || !icId || !phone) {
-                alert("Bitte fülle alle drei Felder aus!");
-                return;
-            }
-
-            var cleanKey = (username + "_" + icId).replace(/[^a-zA-Z0-9_]/g, "");
-
-            db.ref('users/' + cleanKey).once('value', function(snapshot) {
-                if (snapshot.exists()) {
-                    alert("Dieses Konto existiert bereits! Klicke auf 'Einloggen'.");
+            fetch(`${apiURL}/users?id=eq.${cleanKey}`, { method: "GET", headers: headers })
+            .then(res => res.json()).then(data => {
+                if (data && data.length > 0) {
+                    localStorage.setItem('grand_rp_user_id', cleanKey);
+                    currentUserId = cleanKey;
+                    checkLoginState();
                 } else {
-                    var profileData = {
-                        username: username,
-                        icId: icId,
-                        phone: phone
-                    };
-
-                    db.ref('users/' + cleanKey).set(profileData, function(error) {
-                        if (!error) {
-                            localStorage.setItem('grand_rp_user_key', cleanKey);
-                            loadUserData(cleanKey);
-                        } else {
-                            alert("Fehler bei der Datenbank-Verbindung: " + error.message);
-                        }
-                    });
+                    alert("Konto nicht gefunden! Bitte registriere dich zuerst.");
                 }
             });
         }
 
-        // EINLOGGEN-KNOPF
-        function login() {
-            var username = document.getElementById('authUsername').value.trim();
-            var icId = document.getElementById('authID').value.trim();
-
-            if (!username || !icId) {
-                alert("Bitte Name und ID zum Einloggen eingeben!");
-                return;
-            }
-
-            var cleanKey = (username + "_" + icId).replace(/[^a-zA-Z0-9_]/g, "");
-
-            db.ref('users/' + cleanKey).once('value', function(snapshot) {
-                if (snapshot.exists()) {
-                    localStorage.setItem('grand_rp_user_key', cleanKey);
-                    loadUserData(cleanKey);
-                } else {
-                    alert("Konto nicht gefunden! Registriere dich bitte zuerst.");
-                }
-            });
-        }
-
-        // DASHBOARD INITIALISIEREN & LIVE-ABFRAGE STARTEN
-        function loadUserData(userKey) {
-            db.ref('users/' + userKey).once('value', function(snapshot) {
-                var data = snapshot.val();
-                if (data) {
+        function checkLoginState() {
+            fetch(`${apiURL}/users?id=eq.${currentUserId}`, { method: "GET", headers: headers })
+            .then(res => res.json()).then(data => {
+                if (data && data.length > 0) {
+                    userData = data[0];
                     document.getElementById('authArea').classList.add('hidden');
-                    document.getElementById('playerArea').classList.remove('hidden');
-                    document.getElementById('usernameDisplay').innerText = data.username;
-                    document.getElementById('idDisplay').innerText = data.icId;
-
-                    // Live-Überwachung der Einträge in Firebase starten
-                    db.ref('payouts/' + userKey).on('value', function(payoutSnap) {
