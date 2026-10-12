@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grand RP DE 03 - Family Payout Tracker</title>
+    <title>Ballas Member Liste & Event Tracker</title>
     <style>
+        /* Originales lila Ballas-Design deiner Netlify-Seite */
         body {
             font-family: 'Segoe UI', sans-serif;
             background-color: #121214;
@@ -18,34 +19,24 @@
 
         .container {
             width: 100%;
-            max-width: 650px;
+            max-width: 750px;
             background-color: #1a1a1e;
             padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.2);
-            border: 1px solid #ff4444;
+            box-shadow: 0 4px 20px rgba(148, 0, 211, 0.3);
+            border: 2px solid #8b008b;
             margin-bottom: 20px;
             box-sizing: border-box;
         }
 
         h1, h2, h3 {
-            color: #ff4444;
+            color: #da70d6;
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-top: 5px;
-        }
-
-        .user-badge {
-            background-color: #26262b;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            margin-bottom: 20px;
-            border-left: 4px solid #ffaa00;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
         }
 
         .form-group {
@@ -63,17 +54,22 @@
             width: 100%;
             padding: 12px;
             background-color: #26262b;
-            border: 1px solid #444;
+            border: 1px solid #555;
             border-radius: 5px;
             color: #fff;
             box-sizing: border-box;
             font-size: 16px;
         }
 
+        select:focus, input:focus {
+            border-color: #da70d6;
+            outline: none;
+        }
+
         button {
             width: 100%;
             padding: 12px;
-            background-color: #ff4444;
+            background-color: #8b008b;
             border: none;
             border-radius: 5px;
             color: white;
@@ -82,26 +78,28 @@
             text-transform: uppercase;
             font-size: 16px;
             margin-top: 10px;
+            transition: background 0.2s;
         }
 
         button:hover {
-            background-color: #cc3333;
+            background-color: #ba55d3;
         }
 
-        .btn-reg {
+        .user-badge {
             background-color: #26262b;
-            border: 1px solid #ffaa00;
-            color: #ffaa00;
-        }
-
-        .btn-reg:hover {
-            background-color: #ffaa00;
-            color: #000;
+            padding: 12px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-left: 4px solid #da70d6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .total-box {
             margin-top: 20px;
-            padding: 15px;
+            padding: 20px;
             background-color: #222227;
             border-radius: 5px;
             border-left: 5px solid #00ff77;
@@ -114,179 +112,185 @@
             font-weight: bold;
         }
 
-        .admin-area {
-            border: 1px solid #ffaa00;
-            background-color: #1a1a1e;
+        .log-list {
+            margin-top: 15px;
+            list-style: none;
+            padding: 0;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
-        .member-row {
+        .log-item {
             background-color: #26262b;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
+            padding: 10px 15px;
+            margin-bottom: 6px;
+            border-radius: 4px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid #00ff77;
-        }
-
-        .btn-pay {
-            background-color: #00ff77;
-            color: #000;
-            width: auto;
-            padding: 8px 15px;
             font-size: 14px;
-            margin-top: 0;
+            border-left: 3px solid #da70d6;
         }
 
         .hidden {
             display: none !important;
         }
 
-        .log-list {
-            margin-top: 15px;
-            list-style: none;
-            padding: 0;
-            max-height: 180px;
-            overflow-y: auto;
-        }
-
-        .log-item {
-            background-color: #222227;
-            padding: 8px 12px;
-            margin-bottom: 5px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            border-left: 3px solid #ff4444;
+        .footer {
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <!-- ANMELDUNG -->
+    <!-- BALLAS BOARD: LOGIN -->
     <div class="container" id="authArea">
-        <h1>Grand RP DE 03 Tracker</h1>
+        <h1>Ballas Login</h1>
+        <p style="text-align: center; color: #aaa;">Bitte melde dich an, um das Member-Board zu bearbeiten.</p>
+        
         <div class="form-group">
             <label>IC Name (Vorname_Nachname):</label>
-            <input type="text" id="authUsername" placeholder="Max_Mustermann">
+            <input type="text" id="authUsername" placeholder="Mia_Parker">
         </div>
+        
         <div class="form-group">
             <label>IC ID (Visumsnummer):</label>
             <input type="number" id="authID" placeholder="12345">
         </div>
+        
         <div class="form-group">
-            <label>Telefonnummer:</label>
-            <input type="number" id="authPhone" placeholder="99887766">
+            <label>Ballas Rang:</label>
+            <select id="authRang">
+                <option value="1 · Snitch">1 · Snitch</option>
+                <option value="2 · Day One">2 · Day One</option>
+                <option value="3 · Lil Homie">3 · Lil Homie</option>
+                <option value="4 · Turfer">4 · Turfer</option>
+                <option value="5 · Full Balla">5 · Full Balla</option>
+                <option value="6 · Young Boss">6 · Young Boss</option>
+                <option value="7 · Caller">7 · Caller</option>
+                <option value="8 · Underboss">8 · Underboss</option>
+                <option value="9 · Vize OG">9 · Vize OG</option>
+                <option value="10 · OG">10 · OG</option>
+            </select>
         </div>
-        <button onclick="handleLogin()">Einloggen</button>
-        <button onclick="handleRegister()" class="btn-reg">Neues Konto registrieren</button>
+
+        <button onclick="handleAuth()">Zum Set hinzufügen / Einloggen</button>
     </div>
 
-    <!-- SPIELER-OBERFLÄCHE -->
+    <!-- BALLAS BOARD: EVENT TRACKER -->
     <div class="container hidden" id="playerArea">
-        <h1>Grand RP Tracker</h1>
+        <h1>Ballas Live Board</h1>
+        
         <div class="user-badge">
-            <div><strong id="usernameDisplay">...</strong> (ID: <span id="idDisplay">...</span>) | <span id="userRang">Mitglied</span></div>
-            <button onclick="logout()" style="width:auto; padding:5px 10px; margin:0; background:#444; font-size:12px;">Abmelden</button>
+            <div>Ghetto-Akte: <strong id="usernameDisplay">...</strong> | ID: <span id="idDisplay">...</span> | Rang: <strong id="rangDisplay" style="color: #da70d6;">...</strong></div>
+            <button onclick="logout()" style="width:auto; padding:5px 10px; margin:0; background:#444; font-size:12px;">Logout</button>
         </div>
 
+        <h3>Neues Event eintragen</h3>
         <div class="form-group">
-            <label>Uhrzeit des Events:</label>
+            <label>Anfahrts-Uhrzeit:</label>
             <input type="time" id="eventTime">
         </div>
 
         <div class="form-group">
-            <label>Event auswählen:</label>
+            <label>Event-Typ:</label>
             <select id="eventType">
                 <option value="50000">Flugzeugträger ($50.000)</option>
                 <option value="40000">Waffenfabrik ($40.000)</option>
                 <option value="60000">Gießerei ($60.000)</option>
                 <option value="75000">Informations-Panel ($75.000)</option>
+                <option value="30000">U-Boot ($30.000)</option>
                 <option value="100000">König der Insel ($100.000)</option>
             </select>
         </div>
 
-        <button onclick="addEvent()">Event eintragen</button>
+        <button onclick="addEvent()">Event im Set eintragen</button>
 
         <div class="total-box">
-            <h3>Deine offene Auszahlung:</h3>
+            <h3>Deine gesamte offene Auszahlung:</h3>
             <div class="total-amount" id="userTotal">$0</div>
         </div>
 
         <h3>Deine heutigen Einträge:</h3>
         <ul class="log-list" id="myLogList"></ul>
+        
+        <button onclick="clearTracker()" style="background-color: #444; margin-top: 20px; font-size: 14px;">Auszahlung erhalten (Tracker auf $0 zurücksetzen)</button>
     </div>
 
-    <!-- CHEF-OBERFLÄCHE -->
-    <div class="container admin-area hidden" id="adminArea">
-        <h2>Chef-Interface (Auszahlungen)</h2>
-        <p style="text-align: center; color: #aaa; font-size: 14px;">Offene Beträge aller Familienmitglieder:</p>
-        <div id="adminMemberList"></div>
+    <div class="footer">
+        Designed and Powered by Norbert Red & AI © 2026
     </div>
 
     <script>
-        // Sichere Live-Datenbankverbindung über REST-API
-        const apiURL = "https://supabase.co";
-        const headers = {
-            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXh3b21za3d1bnB4dHZjbHB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI4OTAwMDAsImV4cCI6MjAyODQ2MDAwMH0.1_Active_DE03_Tracker_System_Secure_Key",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXh3b21za3d1bnB4dHZjbHB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI4OTAwMDAsImV4cCI6MjAyODQ2MDAwMH0.1_Active_DE03_Tracker_System_Secure_Key",
-            "Content-Type": "application/json",
-            "Prefer": "return=representation"
-        };
-
-        let currentUserId = localStorage.getItem('grand_rp_user_id') || null;
-        let userData = null;
-
-        if (currentUserId) { checkLoginState(); }
-
-        function handleRegister() {
-            const name = document.getElementById('authUsername').value.trim();
-            const id = document.getElementById('authID').value.trim();
-            const phone = document.getElementById('authPhone').value.trim();
-
-            if (!name || !id || !phone) { return alert("Bitte alle Felder ausfüllen!"); }
-            const cleanKey = (name + "_" + id).replace(/[^a-zA-Z0-9_]/g, "");
-
-            fetch(`${apiURL}/rpc/get_user_count`, { method: "POST", headers: headers })
-            .then(res => res.json()).then(count => {
-                const role = count > 0 ? "Mitglied" : "Chef";
-                
-                fetch(`${apiURL}/users`, {
-                    method: "POST",
-                    headers: headers,
-                    body: JSON.stringify({ id: cleanKey, username: name, ic_id: id, phone: phone, role: role })
-                }).then(() => {
-                    localStorage.setItem('grand_rp_user_id', cleanKey);
-                    currentUserId = cleanKey;
-                    checkLoginState();
-                }).catch(() => alert("Registrierungsfehler. Name/ID eventuell schon vergeben."));
-            });
+        // Prüfen, ob bereits Daten im Browser-Speicher hinterlegt sind
+        var savedID = localStorage.getItem('ballas_id');
+        if (savedID) {
+            showDashboard(savedID, localStorage.getItem('ballas_name'), localStorage.getItem('ballas_rang'));
         }
 
-        function handleLogin() {
-            const name = document.getElementById('authUsername').value.trim();
-            const id = document.getElementById('authID').value.trim();
-            if (!name || !id) { return alert("Bitte Name und ID eingeben!"); }
-            
-            const cleanKey = (name + "_" + id).replace(/[^a-zA-Z0-9_]/g, "");
+        function handleAuth() {
+            var name = document.getElementById('authUsername').value.trim();
+            var id = document.getElementById('authID').value.trim();
+            var rang = document.getElementById('authRang').value;
 
-            fetch(`${apiURL}/users?id=eq.${cleanKey}`, { method: "GET", headers: headers })
-            .then(res => res.json()).then(data => {
-                if (data && data.length > 0) {
-                    localStorage.setItem('grand_rp_user_id', cleanKey);
-                    currentUserId = cleanKey;
-                    checkLoginState();
-                } else {
-                    alert("Konto nicht gefunden! Bitte registriere dich zuerst.");
-                }
-            });
+            if (!name || !id) {
+                alert("Bitte fülle Name und ID aus, um das Ghetto-Board zu betreten!");
+                return;
+            }
+
+            // Speichert die Profildaten direkt sicher im Browser ab
+            localStorage.setItem('ballas_id', id);
+            localStorage.setItem('ballas_name', name);
+            localStorage.setItem('ballas_rang', rang);
+
+            showDashboard(id, name, rang);
         }
 
-        function checkLoginState() {
-            fetch(`${apiURL}/users?id=eq.${currentUserId}`, { method: "GET", headers: headers })
-            .then(res => res.json()).then(data => {
-                if (data && data.length > 0) {
-                    userData = data[0];
-                    document.getElementById('authArea').classList.add('hidden');
+        function showDashboard(id, name, rang) {
+            document.getElementById('authArea').classList.add('hidden');
+            document.getElementById('playerArea').classList.remove('hidden');
+            document.getElementById('usernameDisplay').innerText = name;
+            document.getElementById('idDisplay').innerText = id;
+            document.getElementById('rangDisplay').innerText = rang;
+            updateLogList();
+        }
+
+        function addEvent() {
+            var time = document.getElementById('eventTime').value;
+            var select = document.getElementById('eventType');
+            var amount = parseInt(select.value);
+            var eventName = select.options[select.selectedIndex].text.split(' (')[0];
+
+            if (!time) {
+                alert("Bitte gib eine Uhrzeit an!");
+                return;
+            }
+
+            var logs = JSON.parse(localStorage.getItem('ballas_logs') || "[]");
+            logs.push({ time: time, name: eventName, amount: amount });
+            localStorage.setItem('ballas_logs', JSON.stringify(logs));
+
+            updateLogList();
+            document.getElementById('eventTime').value = "";
+        }
+
+        function updateLogList() {
+            var logs = JSON.parse(localStorage.getItem('ballas_logs') || "[]");
+            var list = document.getElementById('myLogList');
+            list.innerHTML = "";
+            let total = 0;
+
+            logs.forEach(function(e) {
+                total += e.amount;
+                var li = document.createElement('li');
+                li.className = 'log-item';
+                li.innerHTML = `<span><strong>${e.time} Uhr</strong> - ${e.name}</span> <span>+$${e.amount.toLocaleString('de-DE')}</span>`;
+                list.appendChild(li);
+            });
+
+            document.getElementById('userTotal').innerText = "$" + total.toLocaleString('de-DE');
+        }
+
+        function clearTracker() {
