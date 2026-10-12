@@ -12,27 +12,30 @@
 </head>
 <body>
 
-    <!-- ANMELDUNG / REGISTRIERUNG -->
+    <!-- ANMELDUNG & REGISTRIERUNG (BEIDES DIREKT SICHTBAR) -->
     <div class="container" id="authArea">
-        <h1 id="authTitle">Grand RP DE 03 Login</h1>
+        <h1>Grand RP DE 03 Tracker</h1>
         
-        <div class="form-group">
-            <label for="authUsername">IC Name (Vorname_Nachname):</label>
-            <input type="text" id="authUsername" placeholder="Max_Mustermann">
-        </div>
-        
-        <div class="form-group">
-            <label for="authID">IC ID (Visumsnummer):</label>
-            <input type="number" id="authID" placeholder="12345">
-        </div>
-        
-        <div class="form-group hidden" id="phoneGroup">
-            <label for="authPhone">Telefonnummer:</label>
-            <input type="number" id="authPhone" placeholder="99887766">
+        <div class="auth-box">
+            <div class="form-group">
+                <label for="authUsername">IC Name (Vorname_Nachname):</label>
+                <input type="text" id="authUsername" placeholder="Max_Mustermann">
+            </div>
+            
+            <div class="form-group">
+                <label for="authID">IC ID (Visumsnummer):</label>
+                <input type="number" id="authID" placeholder="12345">
+            </div>
+            
+            <div class="form-group" id="phoneGroup">
+                <label for="authPhone">Telefonnummer (nur für Registrierung nötig):</label>
+                <input type="number" id="authPhone" placeholder="99887766">
+            </div>
         </div>
 
-        <button id="authBtn" onclick="handleAuth()">Einloggen</button>
-        <button id="toggleAuthBtn" class="btn-toggle" onclick="toggleAuthMode()">Noch kein Konto? Hier registrieren</button>
+        <!-- Zwei separate, klare Knöpfe -->
+        <button id="btnLogin" onclick="handleLogin()">Einloggen</button>
+        <button id="btnRegister" onclick="handleRegister()" class="btn-reg">Neues Konto registrieren</button>
     </div>
 
     <!-- SPIELER-OBERFLÄCHE -->
@@ -78,7 +81,7 @@
         <div id="adminMemberList"></div>
     </div>
 
-    <!-- JavaScript-Datei verknüpfen -->
+    <!-- JavaScript-Datei verknüpfen (Datei muss exakt script.js heißen!) -->
     <script src="script.js"></script>
 </body>
 </html>
