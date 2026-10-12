@@ -4,8 +4,153 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ballas Member Liste & Management Board</title>
+    
+    <!-- DIE LOGIK DIREKT IM HEAD-BEREICH (SICHER GEGEN ABSCHNEIDEN) -->
+    <script>
+        // Accounts direkt initialisieren
+        if (!localStorage.getItem('ballas_accounts')) {
+            var defaultAccounts = [
+                { name: "Mia_Parker", password: "123", rang: "Admin", events: 0 },
+                { name: "Norbert_Red", password: "123", rang: "Admin", events: 0 }
+            ];
+            localStorage.setItem('ballas_accounts', JSON.stringify(defaultAccounts));
+        }
+
+        var currentSession = null;
+
+        // DIESE FUNKTION WIRD JETZT GARANTIERT GEFUNDEN
+        function handleLogin() {
+            var user = document.getElementById('loginUser').value.trim();
+            var pass = document.getElementById('loginPassword').value.trim();
+
+            if (!user || !pass) { return alert("Bitte Logindaten eingeben!"); }
+
+            var accounts = JSON.parse(localStorage.getItem('ballas_accounts'));
+            var found = accounts.find(a => m_clean(a.name) === m_clean(user) && a.password === pass);
+
+            if (!found) { return alert("Falscher Benutzername oder falsches Passwort! Hinweis: Nutze Unterstriche wie Mia_Parker."); }
+
+            currentSession = found;
+
+            document.getElementById('authArea').classList.add('hidden');
+            document.getElementById('dashboardArea').classList.remove('hidden');
+            document.getElementById('mainTitle').innerText = currentSession.name + " · Board";
+            document.getElementById('roleDisplay').innerText = currentSession.rang === "Admin" ? "Rang 2 · Admin" : "Rang 1 · Member";
+
+            if (currentSession.rang === "Admin") {
+                document.getElementById('adminGrid').classList.remove('hidden');
+                document.getElementById('thAction').classList.remove('hidden');
+            } else {
+                document.getElementById('adminGrid').classList.add('hidden');
+                document.getElementById('thAction').classList.add('hidden');
+            }
+
+            updateUI();
+        }
+
+        function updateUI() {
+            var accounts = JSON.parse(localStorage.getItem('ballas_accounts')) || [];
+            var tableBody = document.getElementById('memberTableBody');
+            var selectMenu = document.getElementById('selectManageMember');
+            
+            if (!tableBody || !selectMenu) return;
+            
+            tableBody.innerHTML = "";
+            selectMenu.innerHTML = '<option value="">ID / Name auswählen...</option>';
+
+            accounts.forEach(a => {
+                var tr = document.createElement('tr');
+                var actionCell = currentSession.rang === "Admin" ? `<td><button class="btn-pay" onclick="clearPayout('${a.name}')">Ausgezahlt</button></td>` : '';
+                
+                tr.innerHTML = `
+                    <td><strong>${a.name}</strong></td>
+                    <td><span class="${a.rang === 'Admin' ? 'badge-admin' : 'badge-member'}">${a.rang}</span></td>
+                    <td style="color:#22c55e; font-weight:bold;">$${(a.events || 0).toLocaleString('de-DE')}</td>
+                    ${actionCell}
+                `;
+                tableBody.appendChild(tr);
+
+                if (m_clean(a.name) !== m_clean(currentSession.name)) {
+                    var opt = document.createElement('option');
+                    opt.value = a.name;
+                    opt.innerText = a.name;
+                    selectMenu.appendChild(opt);
+                }
+            });
+
+            var foundSelf = accounts.find(a => m_clean(a.name) === m_clean(currentSession.name));
+            document.getElementById('userTotal').innerText = "$" + (foundSelf ? foundSelf.events || 0 : 0).toLocaleString('de-DE');
+        }
+
+        function addEvent() {
+            var time = document.getElementById('eventTime').value;
+            var select = document.getElementById('eventType');
+            var amount = parseInt(select.value);
+
+            if (!time) { return alert("Bitte Uhrzeit eintragen!"); }
+
+            var accounts = JSON.parse(localStorage.getItem('ballas_accounts'));
+            var index = accounts.findIndex(a => m_clean(a.name) === m_clean(currentSession.name));
+            
+            if (index !== -1) {
+                accounts[index].events = (accounts[index].events || 0) + amount;
+            }
+
+            localStorage.setItem('ballas_accounts', JSON.stringify(accounts));
+            updateUI();
+            document.getElementById('eventTime').value = "";
+            alert("Aktivität erfolgreich verbucht!");
+        }
+
+        function addMember() {
+            var name = document.getElementById('newBallaName').value.trim();
+            var pass = document.getElementById('newBallaPassword').value.trim();
+            var rang = document.getElementById('newBallaRang').value;
+
+            if (!name || !pass) { return alert("Bitte alle Felder ausfüllen!"); }
+
+            var accounts = JSON.parse(localStorage.getItem('ballas_accounts'));
+            if (accounts.some(a => m_clean(a.name) === m_clean(name))) { return alert("Dieser Benutzername existiert bereits!"); }
+
+            accounts.push({ name: name, password: pass, rang: rang, events: 0 });
+            localStorage.setItem('ballas_accounts', JSON.stringify(accounts));
+            
+            updateUI();
+            document.getElementById('newBallaName').value = "";
+            document.getElementById('newBallaPassword').value = "";
+            alert("Neues Mitglied erfolgreich im Set angelegt!");
+        }
+
+        function deleteMember() {
+            var targetName = document.getElementById('selectManageMember').value;
+            if (!targetName) return alert("Wähle ein Mitglied aus!");
+            
+            if (confirm(`Möchtest du ${targetName} wirklich dauerhaft aus dem Set austragen?`)) {
+                var accounts = JSON.parse(localStorage.getItem('ballas_accounts'));
+                accounts = accounts.filter(a => a.name !== targetName);
+                localStorage.setItem('ballas_accounts', JSON.stringify(accounts));
+                updateUI();
+                alert("Mitglied erfolgreich ausgetragen.");
+            }
+        }
+
+        function clearPayout(targetName) {
+            if (confirm(`Auszahlung für ${targetName} bestätigen und auf $0 zurücksetzen?`)) {
+                var accounts = JSON.parse(localStorage.getItem('ballas_accounts'));
+                var index = accounts.findIndex(a => m_clean(a.name) === m_clean(targetName));
+                if (index !== -1) {
+                    accounts[index].events = 0;
+                }
+                localStorage.setItem('ballas_accounts', JSON.stringify(accounts));
+                updateUI();
+            }
+        }
+
+        function m_clean(str) { return str.toLowerCase().replace(/[^a-z0-9_]/g, ""); }
+        function logout() { location.reload(); }
+    </script>
+
     <style>
-        /* Originales futuristisches Ballas-Design deiner Netlify-Seite */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
 
         body {
@@ -86,132 +231,3 @@
         label { display: block; margin-bottom: 6px; font-size: 12px; color: #94a3b8; text-transform: uppercase; }
         
         input, select {
-            width: 100%; padding: 10px 14px; border-radius: 10px;
-            background: rgba(15,23,42,.8); border: 1px solid rgba(129,140,248,.3);
-            color: #fff; font-size: 14px; outline: none;
-        }
-        input:focus, select:focus { border-color: #a855f7; box-shadow: 0 0 10px rgba(168,85,247,0.5); }
-
-        button {
-            width: 100%; padding: 12px; border-radius: 10px; border: none;
-            background: linear-gradient(135deg, #a855f7, #7c3aed);
-            color: #fff; font-weight: 700; text-transform: uppercase; cursor: pointer;
-            margin-top: 5px; transition: all 0.2s;
-        }
-        button:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(168,85,247,0.5); }
-
-        .btn-pay {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            padding: 5px 10px;
-            font-size: 11px;
-            width: auto;
-            display: inline-block;
-            margin-top: 0;
-        }
-        .btn-pay:hover { box-shadow: 0 4px 10px rgba(34,197,94,0.4); }
-
-        /* Tabelle & Badges */
-        .table-wrapper { overflow-x: auto; margin-top: 10px; border-radius: 12px; border: 1px solid rgba(129,140,248,.3); }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-        th, td { padding: 12px; }
-        th { background: rgba(15,23,42,.95); color: #94a3b8; text-transform: uppercase; font-size: 11px; letter-spacing: .1em; }
-        tbody tr { border-bottom: 1px solid rgba(30,41,59,.5); background: rgba(15,23,42,.4); }
-        tbody tr:hover { background: rgba(129,140,248,.1); }
-
-        .badge-admin { padding: 3px 8px; border-radius: 999px; font-size: 11px; background: rgba(168,85,247,.2); border: 1px solid #a855f7; color: #f3e8ff; }
-        .badge-member { padding: 3px 8px; border-radius: 999px; font-size: 11px; background: rgba(148,163,184,.2); border: 1px solid #94a3b8; color: #f8fafc; }
-
-        .total-box { background: rgba(34,197,94,.1); border-left: 4px solid #22c55e; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
-        .total-amount { font-size: 28px; color: #22c55e; font-weight: 800; }
-        
-        .hidden { display: none !important; }
-        .footer { font-size: 11px; color: #475569; text-align: center; margin-top: 20px; }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <!-- HEADER -->
-        <div class="header">
-            <div class="title" id="mainTitle">Ballas Board</div>
-            <div class="status-pill"><div class="status-dot"></div><span id="roleDisplay">Gast</span></div>
-        </div>
-
-        <!-- INHALT -->
-        <div class="content">
-
-            <!-- LOGIN-BEREICH -->
-            <div id="authArea" class="card" style="max-width: 500px; margin: 0 auto; width: 100%;">
-                <h2>Ballas Login</h2>
-                <div class="form-group">
-                    <label>Benutzername (IC Name):</label>
-                    <input type="text" id="loginUser" placeholder="Mia_Parker">
-                </div>
-                <div class="form-group">
-                    <label>Passwort:</label>
-                    <input type="password" id="loginPassword" placeholder="••••••••">
-                </div>
-                <button onclick="handleLogin()">Login</button>
-            </div>
-
-            <!-- HAUPTMENÜ (NACH LOGIN SICHTBAR) -->
-            <div id="dashboardArea" class="hidden">
-                
-                <!-- EVENT TRACKER CARD (FÜR ALLE SICHTBAR) -->
-                <div class="card" style="margin-bottom: 20px;">
-                    <h3>Ballas Event-Tracker & Auszahlung</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                        <div class="form-group">
-                            <label>Uhrzeit des Events:</label>
-                            <input type="time" id="eventTime">
-                        </div>
-                        <div class="form-group">
-                            <label>Aktivität auswählen:</label>
-                            <select id="eventType">
-                                <option value="50000">Flugzeugträger ($50.000)</option>
-                                <option value="40000">Waffenfabrik ($40.000)</option>
-                                <option value="60000">Gießerei ($60.000)</option>
-                                <option value="75000">Informations-Panel ($75.000)</option>
-                                <option value="100000">König der Insel ($100.000)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button onclick="addEvent()">Aktivität im Set verbuchen</button>
-                    
-                    <div class="total-box" style="margin-top: 15px;">
-                        <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Deine offene Event-Auszahlung:</div>
-                        <div class="total-amount" id="userTotal">$0</div>
-                    </div>
-                </div>
-
-                <!-- MANAGEMENT GRID -->
-                <div class="management-grid hidden" id="adminGrid">
-                    
-                    <!-- NEUEN BALLA EINTRAGEN -->
-                    <div class="card" id="adminCardAdd">
-                        <h3>Neuen Balla eintragen</h3>
-                        <div class="form-group">
-                            <label>Benutzername:</label>
-                            <input type="text" id="newBallaName" placeholder="Ali_Verona">
-                        </div>
-                        <div class="form-group">
-                            <label>Passwort:</label>
-                            <input type="text" id="newBallaPassword" placeholder="ballas123">
-                        </div>
-                        <div class="form-group">
-                            <label>Berechtigungs-Rang:</label>
-                            <select id="newBallaRang">
-                                <option value="Member">Rang 1 · Member (nur eintragen)</option>
-                                <option value="Admin">Rang 2 · Admin (volle Verwaltung)</option>
-                            </select>
-                        </div>
-                        <button onclick="addMember()">+ Login anlegen</button>
-                    </div>
-
-                    <!-- MITGLIED AUSTRAGEN / VERWALTEN -->
-                    <div class="card" id="adminCardManage">
-                        <h3>Mitglied verwalten</h3>
-                        <div class="form-group">
-                            <label>Mitglied wählen:</label>
-                            <select id="selectManageMember">
-                                <option value="">ID / Name auswählen...</option>
